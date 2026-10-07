@@ -1,0 +1,1716 @@
+<title>WildLens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: field-station dashboard. Fixed sidebar (desktop) / bottom tab bar with a central Rescue button (phone).
+   Each screen opens with a dark "canopy" band (contour-line texture), then light working surfaces. */
+:root{
+  --bg:#F1F4EE; --surface:#FFFFFF; --surface-2:#EBF0E6; --ink:#13221A; --muted:#58695D; --line:#DAE2D4;
+  --forest:#1D5235; --forest-ink:#FFFFFF; --canopy:#0F2A1C; --canopy-ink:#EAF2E4; --canopy-muted:#A9BFA9; --lime:#BCE05C;
+  --ember:#D4491F; --ember-ink:#FFFFFF; --ember-soft:#FBE7DF;
+  --ok:#24784A; --warn:#A8650E; --bad:#B0372A;
+  --shadow:0 1px 2px rgba(16,34,24,.06),0 8px 24px -12px rgba(16,34,24,.18);
+  --display:"Young Serif", Georgia, "Times New Roman", serif;
+  --body:"Instrument Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --r:14px; --r-sm:10px;
+  --contours:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22560%22 height=%22360%22 viewBox=%220 0 560 360%22%3E%3Cg fill=%22none%22 stroke=%22%23BCE05C%22 stroke-width=%221.2%22%3E%3Cpath d=%22M172 120 L173 122 L172 124 L171 126 L169 128 L167 129 L165 131 L163 132 L161 133 L159 134 L157 135 L155 136 L153 136 L151 137 L148 137 L146 137 L144 137 L142 137 L140 137 L138 137 L136 137 L134 137 L131 138 L128 139 L125 139 L122 139 L119 139 L116 138 L114 136 L113 134 L112 132 L112 130 L113 127 L114 125 L116 123 L117 121 L118 120 L119 119 L119 117 L119 116 L118 114 L118 112 L118 111 L118 109 L119 107 L120 105 L122 104 L124 103 L126 102 L128 101 L130 100 L132 99 L135 98 L137 97 L140 97 L143 97 L145 98 L148 99 L150 100 L151 102 L152 104 L153 106 L154 108 L154 109 L155 110 L157 111 L159 112 L161 113 L164 114 L167 115 L169 116 L171 118 L172 120Z%22/%3E%3Cpath d=%22M208 120 L207 124 L204 128 L200 132 L195 135 L190 137 L185 139 L180 141 L176 142 L173 144 L169 146 L167 148 L164 150 L160 152 L157 154 L153 156 L149 157 L144 158 L140 158 L135 159 L131 159 L126 160 L120 160 L115 160 L109 160 L103 159 L98 157 L94 154 L91 151 L89 146 L89 142 L90 137 L93 133 L95 129 L98 126 L99 123 L100 120 L99 117 L98 114 L96 111 L94 107 L92 103 L91 99 L92 95 L93 91 L96 88 L100 85 L105 83 L110 81 L115 80 L120 79 L125 78 L130 78 L135 78 L140 78 L145 79 L149 80 L154 82 L157 85 L160 88 L163 91 L165 93 L167 96 L170 98 L173 99 L178 101 L183 102 L188 103 L194 105 L199 108 L204 112 L207 116 L208 120Z%22/%3E%3Cpath d=%22M240 120 L236 126 L230 132 L222 136 L214 140 L206 143 L198 145 L193 147 L188 150 L185 153 L182 157 L179 162 L176 167 L172 171 L167 176 L162 179 L155 182 L148 184 L140 185 L132 185 L125 184 L117 183 L109 182 L102 181 L94 179 L87 176 L81 172 L76 167 L73 162 L72 155 L72 149 L74 143 L76 137 L78 132 L80 128 L80 124 L78 120 L75 116 L70 111 L66 105 L62 99 L59 92 L58 85 L60 78 L64 73 L70 68 L78 65 L87 63 L95 63 L104 63 L112 63 L120 64 L127 64 L133 64 L140 65 L146 65 L153 66 L159 68 L165 70 L170 72 L175 75 L180 78 L185 80 L191 82 L197 84 L204 87 L212 89 L220 92 L228 96 L235 101 L239 107 L241 113 L240 120Z%22/%3E%3Cpath d=%22M263 120 L256 128 L247 134 L237 139 L227 143 L218 147 L211 150 L206 154 L202 159 L201 165 L199 172 L197 180 L194 189 L188 197 L181 204 L172 209 L162 212 L151 213 L140 212 L129 210 L119 207 L110 204 L101 200 L92 196 L84 192 L77 187 L70 182 L64 176 L60 169 L58 163 L57 156 L57 149 L57 142 L56 137 L55 131 L52 126 L47 120 L41 114 L34 106 L28 98 L24 89 L22 79 L24 70 L29 62 L37 56 L48 52 L60 50 L73 49 L86 50 L97 52 L107 53 L116 54 L124 54 L132 54 L140 52 L148 51 L157 50 L166 49 L175 50 L183 51 L192 53 L201 56 L209 59 L217 63 L226 67 L235 71 L244 76 L252 81 L260 88 L265 95 L268 103 L267 112 L263 120Z%22/%3E%3Cpath d=%22M277 120 L269 128 L260 136 L250 142 L241 147 L233 152 L228 158 L226 164 L225 173 L224 182 L223 193 L221 205 L215 217 L207 227 L196 235 L183 239 L169 241 L154 239 L140 235 L127 229 L116 223 L105 216 L96 210 L87 204 L78 199 L70 194 L62 189 L54 184 L47 178 L41 171 L36 165 L32 157 L28 150 L24 143 L19 136 L14 128 L7 120 L0 111 L-6 101 L-11 90 L-13 79 L-11 68 L-5 58 L4 50 L18 44 L33 41 L50 40 L66 41 L80 43 L93 45 L104 47 L113 46 L122 44 L131 40 L140 35 L151 30 L162 26 L175 23 L188 22 L201 23 L213 26 L225 30 L235 36 L245 42 L254 49 L262 57 L270 65 L276 73 L282 82 L285 91 L285 101 L283 111 L277 120Z%22/%3E%3Cpath d=%22M289 120 L284 129 L277 138 L270 146 L264 153 L260 161 L257 170 L256 180 L256 192 L255 205 L252 219 L247 233 L238 246 L225 256 L210 262 L192 264 L174 262 L156 257 L140 249 L126 239 L114 230 L103 221 L94 214 L84 209 L74 205 L62 202 L50 199 L38 196 L25 191 L14 185 L4 178 L-5 170 L-12 161 L-19 151 L-24 141 L-30 131 L-35 120 L-39 108 L-42 96 L-43 84 L-40 71 L-34 60 L-23 50 L-9 43 L8 38 L26 36 L44 35 L61 37 L76 38 L88 38 L99 37 L108 32 L118 26 L128 18 L140 9 L154 0 L170 -7 L187 -11 L205 -12 L221 -9 L236 -3 L248 5 L259 15 L267 26 L274 37 L279 48 L284 58 L289 69 L292 79 L294 89 L295 100 L293 110 L289 120Z%22/%3E%3Cpath d=%22M448 250 L450 252 L451 254 L451 256 L451 258 L450 260 L448 262 L446 263 L443 264 L440 265 L436 265 L434 264 L431 264 L429 264 L427 264 L425 265 L424 266 L422 267 L420 268 L418 269 L415 270 L413 270 L410 270 L407 270 L405 269 L403 268 L401 267 L399 266 L397 264 L396 263 L394 261 L393 259 L392 257 L392 256 L392 254 L393 252 L394 250 L396 248 L398 247 L399 246 L401 245 L401 244 L402 242 L402 241 L402 239 L401 236 L402 234 L403 232 L404 229 L406 228 L409 227 L411 226 L414 226 L417 227 L420 228 L422 229 L425 231 L427 232 L428 233 L430 234 L432 235 L434 235 L436 236 L437 237 L439 238 L440 240 L441 241 L442 242 L443 244 L444 245 L445 247 L447 248 L448 250Z%22/%3E%3Cpath d=%22M480 250 L481 254 L482 258 L481 262 L479 266 L476 269 L472 272 L467 274 L461 275 L455 276 L449 276 L444 276 L440 276 L437 277 L434 278 L431 281 L428 284 L424 287 L420 291 L415 293 L409 295 L404 296 L398 295 L393 293 L388 291 L385 287 L382 284 L379 280 L377 277 L375 273 L373 270 L372 267 L371 263 L370 260 L370 257 L371 253 L372 250 L374 247 L375 244 L377 241 L378 239 L378 236 L378 232 L378 228 L378 224 L378 219 L380 215 L382 210 L386 207 L391 204 L397 203 L403 204 L409 205 L415 208 L420 211 L424 214 L428 216 L431 218 L435 220 L438 221 L442 221 L447 222 L451 223 L456 224 L460 225 L464 227 L467 230 L470 233 L472 236 L474 239 L476 243 L478 246 L480 250Z%22/%3E%3Cpath d=%22M508 250 L508 256 L506 261 L504 267 L500 272 L495 276 L489 280 L482 282 L475 284 L468 286 L462 287 L456 288 L451 290 L447 293 L443 297 L439 302 L434 308 L427 313 L420 318 L412 322 L403 323 L394 322 L386 320 L379 315 L373 310 L369 303 L367 297 L365 291 L363 286 L361 281 L359 276 L356 272 L353 268 L351 264 L348 259 L347 255 L346 250 L346 245 L347 240 L347 236 L348 231 L349 225 L349 220 L350 214 L351 207 L354 201 L358 195 L363 190 L370 186 L379 184 L388 184 L397 186 L406 190 L413 194 L420 198 L426 202 L431 205 L436 207 L441 207 L447 207 L454 206 L462 205 L471 205 L479 206 L487 208 L494 212 L499 216 L503 221 L506 227 L507 233 L508 239 L508 244 L508 250Z%22/%3E%3Cpath d=%22M527 250 L525 257 L522 263 L519 270 L515 276 L511 281 L505 286 L499 291 L492 295 L485 298 L479 302 L472 306 L467 310 L461 316 L455 322 L449 329 L441 336 L431 343 L420 347 L408 349 L396 349 L385 346 L376 340 L368 332 L363 323 L360 314 L357 305 L356 298 L353 291 L350 286 L346 282 L340 278 L333 273 L326 269 L320 263 L315 257 L311 250 L310 243 L309 236 L310 228 L312 221 L315 214 L318 206 L322 199 L326 192 L332 185 L340 179 L349 174 L359 172 L370 171 L382 172 L393 175 L403 179 L412 183 L420 187 L427 190 L434 191 L441 191 L450 189 L460 187 L471 184 L483 183 L496 183 L508 185 L519 189 L527 194 L533 202 L536 210 L536 219 L535 227 L533 235 L530 243 L527 250Z%22/%3E%3Cpath d=%22M538 250 L535 257 L533 265 L532 272 L531 280 L530 288 L527 296 L522 303 L516 310 L510 316 L503 323 L495 329 L487 336 L478 343 L469 350 L459 357 L447 364 L434 369 L420 371 L406 371 L392 368 L380 361 L370 352 L362 342 L357 331 L354 320 L351 311 L348 304 L343 298 L336 294 L327 290 L316 286 L303 281 L291 276 L281 268 L273 260 L268 250 L266 240 L268 230 L272 221 L278 212 L285 203 L293 196 L301 188 L310 181 L319 175 L329 170 L340 165 L352 163 L364 162 L377 162 L389 164 L400 167 L410 170 L420 171 L429 172 L439 171 L450 168 L462 164 L476 160 L492 157 L509 156 L524 158 L539 162 L550 169 L557 179 L561 190 L560 202 L557 213 L552 224 L547 233 L542 242 L538 250Z%22/%3E%3Cpath d=%22M498 60 L499 62 L500 64 L501 66 L501 68 L500 70 L498 72 L496 74 L493 74 L490 75 L487 75 L484 75 L481 74 L479 74 L477 74 L475 75 L474 75 L472 77 L470 78 L468 79 L465 80 L463 81 L460 81 L457 80 L455 80 L453 78 L451 77 L449 76 L447 74 L446 73 L445 71 L444 69 L443 67 L442 65 L442 64 L443 62 L444 60 L446 58 L447 57 L449 56 L450 55 L451 53 L452 52 L452 51 L452 49 L452 47 L452 44 L453 42 L454 40 L456 38 L458 37 L461 36 L464 36 L467 37 L470 38 L472 39 L475 41 L477 42 L478 43 L480 44 L482 45 L484 46 L485 47 L487 47 L489 48 L490 50 L491 51 L492 52 L493 54 L495 55 L496 57 L497 58 L498 60Z%22/%3E%3Cpath d=%22M529 60 L530 64 L531 68 L530 72 L529 76 L526 79 L522 82 L517 84 L511 86 L506 86 L500 86 L495 86 L491 86 L487 87 L484 88 L481 90 L478 93 L474 97 L470 100 L465 103 L459 105 L453 106 L448 105 L442 104 L438 101 L434 98 L431 94 L429 90 L427 87 L426 83 L424 80 L423 76 L422 73 L421 70 L421 66 L421 63 L421 60 L423 57 L424 54 L426 51 L427 48 L428 45 L428 42 L428 38 L429 34 L429 30 L431 25 L433 21 L437 17 L441 14 L447 13 L453 13 L459 14 L465 17 L470 20 L474 23 L478 26 L481 28 L485 30 L488 31 L492 32 L496 32 L501 33 L505 34 L510 35 L514 37 L518 40 L521 42 L523 46 L525 49 L527 53 L528 56 L529 60Z%22/%3E%3Cpath d=%22M557 60 L556 66 L555 71 L552 76 L549 81 L545 86 L539 90 L533 93 L526 95 L519 97 L513 98 L507 99 L502 101 L497 103 L493 107 L489 111 L484 117 L477 122 L470 127 L462 131 L453 133 L444 133 L435 130 L428 126 L423 121 L419 114 L416 108 L414 101 L413 95 L412 90 L410 86 L408 82 L405 78 L402 74 L399 69 L397 65 L395 60 L395 55 L395 50 L396 45 L397 40 L398 35 L399 30 L400 24 L402 18 L405 12 L409 6 L414 1 L421 -3 L429 -5 L438 -6 L447 -4 L455 -1 L463 3 L470 7 L476 11 L481 15 L486 17 L491 18 L497 18 L504 17 L511 16 L520 16 L529 16 L537 18 L544 21 L550 26 L554 31 L557 37 L558 42 L559 48 L558 54 L557 60Z%22/%3E%3Cpath d=%22M89 320 L89 322 L89 324 L89 326 L88 328 L87 329 L86 331 L85 333 L83 334 L81 335 L78 336 L75 336 L73 336 L70 336 L68 335 L65 335 L64 335 L62 335 L60 336 L58 337 L56 338 L53 339 L50 340 L47 341 L44 341 L41 340 L39 339 L37 337 L36 335 L35 333 L35 331 L35 329 L35 327 L35 325 L35 323 L35 322 L35 320 L36 318 L36 317 L37 315 L37 314 L38 313 L39 311 L41 310 L42 309 L43 307 L43 305 L44 304 L46 302 L47 300 L49 298 L51 296 L54 295 L57 295 L60 296 L63 297 L65 299 L67 300 L69 302 L70 304 L71 306 L72 307 L73 308 L75 309 L77 309 L79 310 L82 311 L84 312 L86 313 L87 315 L89 316 L89 318 L89 320Z%22/%3E%3Cpath d=%22M122 320 L121 324 L118 328 L116 331 L113 334 L110 337 L107 340 L104 343 L101 345 L97 347 L93 349 L88 350 L84 350 L79 351 L75 351 L71 351 L68 352 L64 354 L60 356 L55 358 L50 361 L45 363 L38 364 L32 364 L26 363 L21 361 L17 358 L15 353 L14 349 L14 344 L15 339 L16 335 L16 332 L17 329 L16 326 L16 323 L14 320 L13 317 L12 314 L11 310 L12 307 L12 304 L14 300 L16 297 L18 294 L21 291 L23 288 L26 284 L30 281 L34 278 L38 276 L43 274 L49 273 L55 274 L60 276 L65 278 L69 282 L72 286 L75 289 L78 292 L80 294 L83 296 L87 296 L91 297 L96 297 L102 298 L108 299 L113 302 L118 304 L121 308 L123 312 L123 316 L122 320Z%22/%3E%3Cpath d=%22M152 320 L147 326 L141 331 L136 335 L131 339 L126 343 L123 347 L119 351 L115 354 L111 358 L107 361 L102 364 L96 367 L91 369 L85 371 L79 373 L73 375 L67 378 L60 381 L52 384 L44 387 L35 388 L26 389 L18 387 L10 384 L4 379 L0 373 L-2 366 L-2 359 L-1 352 L0 345 L2 340 L2 336 L1 332 L-2 328 L-6 324 L-10 320 L-15 315 L-19 310 L-21 304 L-22 298 L-20 292 L-18 287 L-14 282 L-9 277 L-3 273 L3 269 L9 266 L15 263 L22 260 L30 258 L37 257 L45 257 L53 258 L60 261 L67 264 L72 268 L77 272 L82 276 L86 279 L91 280 L97 281 L104 281 L113 281 L122 282 L132 283 L141 285 L148 289 L154 295 L157 301 L158 307 L156 314 L152 320Z%22/%3E%3C/g%3E%3C/svg%3E");
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B120E; --surface:#131C16; --surface-2:#19241D; --ink:#E3EBE2; --muted:#97A79A; --line:#24312A;
+  --forest:#82C79A; --forest-ink:#0B1A11; --canopy:#081A10; --canopy-ink:#E6EFE1; --canopy-muted:#94AB97; --lime:#C8EA6E;
+  --ember:#F1754B; --ember-ink:#1C0B05; --ember-soft:#3A1E15;
+  --ok:#7CCF9C; --warn:#E6AA55; --bad:#EE8573;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.6); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B120E; --surface:#131C16; --surface-2:#19241D; --ink:#E3EBE2; --muted:#97A79A; --line:#24312A;
+  --forest:#82C79A; --forest-ink:#0B1A11; --canopy:#081A10; --canopy-ink:#E6EFE1; --canopy-muted:#94AB97; --lime:#C8EA6E;
+  --ember:#F1754B; --ember-ink:#1C0B05; --ember-soft:#3A1E15;
+  --ok:#7CCF9C; --warn:#E6AA55; --bad:#EE8573;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.6); color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--body);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.005em}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--forest);outline-offset:2px;border-radius:6px}
+a{color:var(--forest)}
+.mono{font-family:var(--mono);font-size:.9em;font-variant-numeric:tabular-nums}
+.sci{font-style:italic;color:var(--muted)}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--muted)}
+.hint{font-size:13px;color:var(--muted)}
+.ico{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:10px 18px;cursor:pointer;font-weight:600;font-size:15px;text-decoration:none;color:var(--ink);transition:transform .12s,border-color .12s,background .12s}
+.btn:hover{border-color:var(--forest)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--forest);color:var(--forest-ink);border-color:var(--forest)}
+.btn.ember{background:var(--ember);color:var(--ember-ink);border-color:var(--ember)}
+.btn.primary:hover,.btn.ember:hover{filter:brightness(1.07)}
+.btn.lg{padding:14px 24px;font-size:16px}
+.btn.block{width:100%}
+.btn[disabled]{opacity:.45;cursor:not-allowed;filter:none}
+.btn .ico{width:18px;height:18px}
+.btn{white-space:nowrap}
+@media (max-width:520px){.row-actions .btn{padding:10px 10px;font-size:14px;gap:6px}}
+.linkbtn{background:none;border:0;padding:0;color:var(--forest);cursor:pointer;font-weight:600}
+
+/* ---------- app shell ---------- */
+.app{display:grid;grid-template-columns:252px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:6px;padding:22px 16px;background:var(--surface);border-right:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;background:none;border:0;cursor:pointer;padding:4px 8px 18px;color:var(--ink)}
+.brand svg{width:36px;height:36px;flex:none}
+.brand b{font-family:var(--display);font-weight:400;font-size:25px}
+.nav{display:grid;gap:2px}
+.nav-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:14px 12px 6px}
+.nav button{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;border-radius:10px;padding:10px 12px;cursor:pointer;color:var(--muted);font-weight:500;text-align:left}
+.nav button:hover{background:var(--surface-2);color:var(--ink)}
+.nav button[aria-current="page"]{background:var(--surface-2);color:var(--ink);font-weight:600;box-shadow:inset 3px 0 0 var(--forest)}
+.nav .count:empty{display:none}
+.nav .count{margin-left:auto;font-size:12px;font-weight:600;background:var(--surface-2);border-radius:999px;padding:1px 8px;color:var(--muted)}
+.nav button[aria-current="page"] .count{background:var(--surface)}
+.side .rescue-cta{margin-top:14px}
+.side-foot{margin-top:auto;display:grid;gap:10px;border-top:1px solid var(--line);padding-top:14px}
+.acct{display:flex;align-items:center;gap:10px;min-width:0}
+.acct .who{min-width:0;font-size:14px;line-height:1.3}
+.acct .who b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--forest);color:var(--forest-ink);display:grid;place-items:center;font-weight:700;font-size:15px;flex:none}
+.topbar,.tabbar{display:none}
+main{min-width:0;padding-bottom:64px}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:clamp(16px,3.4vw,40px)}
+
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .side{display:none}
+  .topbar{display:flex;align-items:center;gap:12px;position:sticky;top:env(safe-area-inset-top,0px);z-index:20;height:58px;padding-inline:16px;background:var(--canopy);color:var(--canopy-ink)}
+  .topbar .brand{padding:0;color:var(--canopy-ink)}
+  .topbar .brand b{font-size:22px}
+  .topbar .brand svg{width:30px;height:30px}
+  .topbar .top-acct{margin-left:auto}
+  .topbar .avatar{width:32px;height:32px;font-size:14px}
+  .topbar .btn{padding:6px 14px;font-size:14px;background:transparent;color:var(--canopy-ink);border-color:rgba(255,255,255,.3)}
+  .tabbar{display:grid;grid-template-columns:repeat(5,1fr);align-items:end;position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+  .tabbar button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-radius:10px}
+  .tabbar button[aria-current="page"]{color:var(--forest)}
+  .tabbar .fab{color:var(--ember)}
+  .tabbar .fab span.bub{width:52px;height:52px;margin-top:-26px;border-radius:50%;background:var(--ember);color:var(--ember-ink);display:grid;place-items:center;box-shadow:0 6px 18px -6px var(--ember);border:4px solid var(--surface)}
+  .tabbar .fab .ico{width:24px;height:24px}
+  main{padding-bottom:110px}
+}
+
+/* ---------- canopy band (screen headers) ---------- */
+.band{position:relative;background:var(--canopy);color:var(--canopy-ink);overflow:hidden;isolation:isolate}
+.band::before{content:"";position:absolute;inset:0;z-index:-1;opacity:.16;background-image:var(--contours);background-size:560px 360px}
+.band::after{content:"";position:absolute;inset:auto 0 0 0;height:1px;background:rgba(255,255,255,.08)}
+.band .wrap{padding-block:34px 34px}
+.band h1{font-size:clamp(30px,4.2vw,48px)}
+.band .eyebrow{color:var(--lime)}
+.band .sub{color:var(--canopy-muted);margin-top:10px;max-width:58ch;font-size:16.5px}
+.band.ember-band{background:linear-gradient(120deg,#3B1408 0%,#0F2A1C 70%)}
+.band.ember-band .eyebrow{color:#FFB89B}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+section.view{animation:fade .25s ease}
+@keyframes fade{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}
+:root.reduce-motion section.view,:root.reduce-motion *{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){section.view,*{animation:none!important;transition:none!important}}
+.stack{display:grid;grid-template-columns:minmax(0,1fr);gap:28px;padding-top:28px}
+.stack>*{min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.card-pad{padding:20px}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.sec-head h2{font-size:24px}
+
+/* ---------- home ---------- */
+.hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(20px,4vw,48px);align-items:center}
+.hero h1{font-size:clamp(34px,4.8vw,56px)}
+.hero h1 em{font-style:normal;color:var(--lime)}
+.tagline{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
+.tagline span{border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600;color:var(--canopy-ink);background:rgba(255,255,255,.04)}
+@media (max-width:980px){.hero{grid-template-columns:1fr}}
+
+.scan{background:var(--surface);color:var(--ink);border-radius:20px;padding:16px;display:grid;gap:12px;box-shadow:0 20px 50px -20px rgba(0,0,0,.55)}
+.drop{position:relative;border:2px dashed var(--line);border-radius:14px;aspect-ratio:16/10;max-width:100%;display:grid;place-items:center;text-align:center;padding:18px;background:var(--surface-2);overflow:hidden;transition:border-color .15s,background .15s;cursor:pointer}
+.drop:hover,.drop.over{border-color:var(--forest)}
+.drop img.preview{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.drop .reticle{position:absolute;inset:12%;border-radius:10px;box-shadow:0 0 0 999px rgba(6,16,10,.42)}
+.drop .reticle i{position:absolute;width:26px;height:26px;border:3px solid var(--lime)}
+.drop .reticle i:nth-child(1){left:-2px;top:-2px;border-right:0;border-bottom:0;border-top-left-radius:10px}
+.drop .reticle i:nth-child(2){right:-2px;top:-2px;border-left:0;border-bottom:0;border-top-right-radius:10px}
+.drop .reticle i:nth-child(3){left:-2px;bottom:-2px;border-right:0;border-top:0;border-bottom-left-radius:10px}
+.drop .reticle i:nth-child(4){right:-2px;bottom:-2px;border-left:0;border-top:0;border-bottom-right-radius:10px}
+.drop .reticle::after{content:"";position:absolute;left:4%;right:4%;height:2px;background:var(--lime);box-shadow:0 0 12px var(--lime);top:0;animation:sweep 1.6s ease-in-out infinite alternate}
+@keyframes sweep{to{top:100%}}
+.drop .status{position:absolute;left:12px;right:12px;bottom:12px;background:var(--surface);color:var(--ink);border-radius:10px;padding:9px 12px;font-size:14px;display:flex;align-items:center;gap:10px;justify-content:space-between;font-weight:600}
+.drop-empty{display:grid;justify-items:center;gap:6px}
+.drop-empty .ring{width:58px;height:58px;border-radius:50%;background:var(--surface);display:grid;place-items:center;color:var(--forest);box-shadow:var(--shadow)}
+.drop-empty .ring .ico{width:28px;height:28px}
+.drop-empty h3{font-size:20px;margin-top:6px}
+.drop-empty p{color:var(--muted);font-size:14px}
+.row-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.msg{font-size:14px;border-radius:10px;padding:10px 12px;background:var(--surface-2)}
+.msg.err{color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,var(--surface))}
+.msg.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,var(--surface))}
+
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.stat{padding:16px 18px;display:grid;gap:4px;align-content:start}
+.stat .k{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);font-weight:600}
+.stat .k .ico{width:17px;height:17px;color:var(--forest)}
+.stat .v{font-family:var(--display);font-size:34px;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat .d{font-size:13px;color:var(--muted)}
+.stat.alert .k .ico{color:var(--ember)}
+@media (max-width:900px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.action{position:relative;display:grid;gap:8px;text-align:left;padding:20px;cursor:pointer;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow);transition:transform .15s,border-color .15s}
+.action:hover{transform:translateY(-2px);border-color:var(--forest)}
+.action .badge{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--surface-2);color:var(--forest)}
+.action .badge .ico{width:24px;height:24px}
+.action h3{font-size:21px}
+.action p{color:var(--muted);font-size:14.5px}
+.action .go{position:absolute;right:18px;top:20px;color:var(--muted)}
+.action.rescue{background:var(--ember);border-color:var(--ember);color:var(--ember-ink)}
+.action.rescue .badge{background:rgba(255,255,255,.18);color:var(--ember-ink)}
+.action.rescue p,.action.rescue .go{color:var(--ember-ink);opacity:.88}
+@media (max-width:900px){.actions{grid-template-columns:1fr}}
+
+.split{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:980px){.split{grid-template-columns:1fr}}
+.list{display:grid}
+.li{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:14px;align-items:center;padding:12px 16px;border-top:1px solid var(--line);background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left;cursor:pointer}
+.li:first-child{border-top:0}
+.li:hover{background:var(--surface-2)}
+.li .th{width:56px;height:42px;border-radius:8px;overflow:hidden;background:var(--surface-2)}
+.li .th svg,.li .th img{width:100%;height:100%;display:block;object-fit:cover}
+.li b{display:block;font-weight:600}
+.li .meta{font-size:13px;color:var(--muted)}
+.empty{border:1px dashed var(--line);border-radius:var(--r);padding:34px 20px;text-align:center;color:var(--muted);display:grid;gap:10px;justify-items:center;background:var(--surface)}
+.empty h3{color:var(--ink);font-size:22px}
+.empty .ico{width:34px;height:34px;color:var(--forest)}
+
+.statusbar{display:flex;height:14px;border-radius:999px;overflow:hidden;background:var(--surface-2);gap:2px}
+.statusbar i{display:block;height:100%}
+.legend{display:grid;gap:8px;margin-top:14px;font-size:14px}
+.legend div{display:flex;align-items:center;gap:10px}
+.legend .sw{width:10px;height:10px;border-radius:3px;flex:none}
+.legend .n{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:600}
+.c-lc{background:var(--ok)} .c-nt{background:color-mix(in srgb,var(--warn) 60%,var(--ok))} .c-vu{background:var(--warn)} .c-en{background:var(--bad)} .c-xx{background:var(--muted)}
+.feature{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;align-items:center;margin-top:18px;padding-top:16px;border-top:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;width:100%}
+.feature .th{aspect-ratio:4/3;border-radius:10px;overflow:hidden}
+.feature .th svg,.feature .th img{width:100%;height:100%;display:block;object-fit:cover}
+
+/* ---------- guide / cards ---------- */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.search{position:relative;flex:1 1 240px;max-width:360px}
+.search input{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:10px 14px 10px 40px}
+.search .ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;cursor:pointer;font-weight:600;font-size:14px;color:var(--muted)}
+.chip:hover{border-color:var(--forest);color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--forest);color:var(--forest-ink);border-color:var(--forest)}
+.chip.on-dark{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2);color:var(--canopy-ink)}
+.chip.on-dark[aria-pressed="true"]{background:var(--lime);color:#13221A;border-color:var(--lime)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:18px}
+@media (max-width:520px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}}
+.tile{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;text-align:left;padding:0;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:transform .15s,border-color .15s}
+.tile:hover{transform:translateY(-3px);border-color:var(--forest)}
+.tile .pic{aspect-ratio:4/3;max-width:100%;background:var(--surface-2);overflow:hidden}
+.tile .pic svg,.tile .pic img{width:100%;height:100%;display:block;object-fit:cover;transition:transform .4s}
+.tile:hover .pic svg,.tile:hover .pic img{transform:scale(1.04)}
+.tile .over{position:absolute;left:10px;top:10px;display:flex;gap:6px}
+.tile .body{padding:12px 14px 14px;display:grid;gap:2px;min-width:0}
+.tile .body b{font-weight:600;font-size:16px}
+.tile .body .sci{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tile .foot{display:flex;justify-content:space-between;gap:8px;margin-top:8px;font-size:12.5px;color:var(--muted)}
+.tile .heart{position:absolute;right:10px;top:10px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.92);color:#C2410C}
+.tile .heart .ico{width:16px;height:16px;fill:currentColor;stroke:none}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px;line-height:1.3;white-space:nowrap}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.pill.plain::before{display:none}
+.st-lc{background:color-mix(in srgb,var(--ok) 16%,var(--surface));color:var(--ok)}
+.st-nt{background:color-mix(in srgb,var(--warn) 14%,var(--surface));color:var(--warn)}
+.st-vu{background:color-mix(in srgb,var(--warn) 18%,var(--surface));color:var(--warn)}
+.st-en,.st-cr{background:color-mix(in srgb,var(--bad) 15%,var(--surface));color:var(--bad)}
+.st-xx{background:var(--surface-2);color:var(--muted)}
+.tag{background:rgba(10,24,16,.72);color:#fff}
+
+/* ---------- lore ---------- */
+.lore-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(20px,4vw,44px);align-items:center}
+.lore-hero .pic{position:relative;aspect-ratio:4/3;max-width:100%;border-radius:18px;overflow:hidden;box-shadow:0 24px 50px -24px rgba(0,0,0,.7)}
+.lore-hero .pic svg,.lore-hero .pic img{width:100%;height:100%;display:block;object-fit:cover}
+.lore-hero .credit{position:absolute;left:10px;bottom:10px;font-size:11.5px;background:rgba(0,0,0,.6);color:#fff;border-radius:6px;padding:3px 8px}
+.lore-hero h1{font-size:clamp(36px,5vw,58px)}
+.lore-hero .sci{color:var(--canopy-muted);font-size:19px;margin-top:6px}
+.lore-hero .subsp{color:var(--canopy-muted);font-size:14px;margin-top:6px}
+.lore-hero .pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.lore-hero .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.lore-hero .btn{background:rgba(255,255,255,.08);color:var(--canopy-ink);border-color:rgba(255,255,255,.22)}
+.lore-hero .btn.saved{background:var(--lime);color:#13221A;border-color:var(--lime)}
+.lore-hero .btn.ember{background:var(--ember);color:var(--ember-ink);border-color:var(--ember)}
+.conf{display:grid;gap:6px;font-size:13px;margin-top:16px;max-width:360px;color:var(--canopy-muted)}
+.conf b{color:var(--canopy-ink)}
+.meter{height:6px;border-radius:999px;background:rgba(255,255,255,.12);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--lime)}
+@media (max-width:820px){.lore-hero{grid-template-columns:1fr}}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0;overflow:hidden}
+.facts div{padding:14px 16px;border-left:1px solid var(--line);min-width:0}
+.facts div:first-child{border-left:0}
+.facts dt{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.facts dd{margin:4px 0 0;font-size:14.5px;font-weight:500}
+@media (max-width:760px){.facts{grid-template-columns:repeat(2,minmax(0,1fr))}.facts div{border-left:0;border-top:1px solid var(--line)}.facts div:nth-child(-n+2){border-top:0}.facts div:nth-child(even){border-left:1px solid var(--line)}.facts div:last-child:nth-child(odd){grid-column:1/-1}}
+.reader{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:40px;align-items:start}
+@media (max-width:980px){.reader{grid-template-columns:minmax(0,1fr)}.reader aside{display:none}}
+.tablist{display:flex;gap:6px;padding:5px;background:var(--surface-2);border-radius:999px;width:max-content;max-width:100%;overflow-x:auto}
+.tablist button{background:none;border:0;padding:9px 18px;border-radius:999px;cursor:pointer;font-weight:600;color:var(--muted);white-space:nowrap;display:flex;gap:8px;align-items:center}
+.tablist button small{font-weight:500;font-size:12px;opacity:.8}
+.tablist button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.prose{display:grid;gap:18px;max-width:68ch;font-size:17.5px;line-height:1.75;margin-top:24px}
+.prose p:first-child::first-letter{font-family:var(--display);float:left;font-size:3.3em;line-height:.85;padding:6px 10px 0 0;color:var(--forest)}
+.note{margin-top:24px;font-size:13px;color:var(--muted);max-width:68ch;border-top:1px solid var(--line);padding-top:12px}
+.aside-card{position:sticky;top:24px;display:grid;gap:12px}
+.aside-card h3{font-size:18px}
+.aside-card .li{grid-template-columns:48px minmax(0,1fr);padding:10px 0;border-top:1px solid var(--line)}
+.aside-card .li .th{width:48px;height:36px}
+.aside-card .li:hover{background:none}
+.aside-card .li:hover b{color:var(--forest)}
+
+/* ---------- timeline (recent) ---------- */
+.day{display:grid;gap:10px}
+.day h3{font-family:var(--body);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+
+/* ---------- rescue ---------- */
+.safety{display:flex;gap:12px;align-items:flex-start;margin-top:18px;max-width:720px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);font-size:14.5px;color:var(--canopy-ink)}
+.safety .ico{color:#FFB89B;margin-top:2px}
+.rescue-layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start}
+@media (max-width:1100px){.rescue-layout{grid-template-columns:1fr}}
+.step{padding:22px;display:grid;gap:16px}
+.step-head{display:flex;gap:14px;align-items:center}
+.step-n{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:var(--surface-2);color:var(--muted);flex:none;font-variant-numeric:tabular-nums}
+.step.done .step-n{background:var(--ok);color:#fff}
+.step-head h2{font-size:22px}
+.step-head p{font-size:14px;color:var(--muted)}
+.photo-drop{aspect-ratio:16/9}
+.rs-photo{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:16/9;max-width:100%;background:var(--surface-2)}
+.rs-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.rs-photo .x{position:absolute;right:10px;top:10px}
+.rs-photo .x .btn{padding:6px 12px;font-size:13px}
+.field{display:grid;gap:6px}
+.field>label,.field>.lbl{font-size:14px;font-weight:600}
+.field .opt{font-weight:500;color:var(--muted);font-size:13px}
+.input,textarea.input,select.input{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:11px 13px}
+textarea.input{min-height:110px;resize:vertical;line-height:1.5}
+.input:focus{outline:2px solid var(--forest);outline-offset:0;border-color:transparent}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:620px){.two{grid-template-columns:1fr}}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:12px;padding:4px;gap:4px;flex-wrap:wrap}
+.seg button{border:0;background:none;padding:8px 16px;border-radius:9px;cursor:pointer;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.seg.urgency button[aria-pressed="true"][data-v="Critical"]{background:var(--bad);color:#fff}
+.seg.urgency button[aria-pressed="true"][data-v="Urgent"]{background:var(--warn);color:#fff}
+.seg.urgency button[aria-pressed="true"][data-v="Stable"]{background:var(--ok);color:#fff}
+.loc-card{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center;padding:14px;border-radius:12px;background:var(--surface-2)}
+.pin{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--forest);color:var(--forest-ink);position:relative}
+.pin::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--forest);opacity:.35;animation:ping 1.8s ease-out infinite}
+@keyframes ping{from{transform:scale(.8);opacity:.5}to{transform:scale(1.4);opacity:0}}
+.loc-card b{display:block}
+.summary{position:sticky;top:24px;padding:20px;display:grid;gap:14px}
+.summary h3{font-size:20px}
+.check{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.check li{display:flex;gap:10px;align-items:center;font-size:14.5px;color:var(--muted)}
+.check li .dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;flex:none}
+.check li.ok{color:var(--ink)}
+.check li.ok .dot{background:var(--ok);border-color:var(--ok);color:#fff}
+.check li .dot .ico{width:12px;height:12px;stroke-width:3}
+.sendto{font-size:13px;border-radius:10px;padding:10px 12px;background:var(--surface-2);color:var(--muted)}
+.sendto b{color:var(--ink)}
+.report{display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 16px;border-top:1px solid var(--line)}
+.report:first-child{border-top:0}
+.report .th{width:72px;height:54px;border-radius:8px;overflow:hidden;background:var(--surface-2)}
+.report .th img{width:100%;height:100%;object-fit:cover;display:block}
+.report b{display:block}
+.report .meta{font-size:13px;color:var(--muted)}
+.mail{font-family:var(--mono);font-size:13px;white-space:pre-wrap;background:var(--surface-2);border-radius:10px;padding:14px;max-height:300px;overflow:auto;line-height:1.6}
+
+/* ---------- settings ---------- */
+.settings{display:grid;gap:18px;max-width:780px}
+.set-group h2{font-size:20px;padding:18px 20px 4px}
+.set-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 20px;border-top:1px solid var(--line)}
+.set-group .set-row:first-of-type{border-top:0}
+.set-row small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.switch{position:relative;width:46px;height:28px;flex:none}
+.switch input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer;z-index:1}
+.switch span{position:absolute;inset:0;border-radius:999px;background:var(--line);transition:background .15s}
+.switch span::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.switch input:checked+span{background:var(--forest)}
+.switch input:checked+span::after{transform:translateX(18px)}
+.switch input:focus-visible+span{outline:2px solid var(--forest);outline-offset:2px}
+.kv{font-size:13px;font-weight:600;border-radius:999px;padding:4px 10px;background:var(--surface-2);color:var(--muted);white-space:nowrap}
+.kv.warn{background:color-mix(in srgb,var(--warn) 15%,var(--surface));color:var(--warn)}
+.kv.good{background:color-mix(in srgb,var(--ok) 15%,var(--surface));color:var(--ok)}
+
+/* ---------- login ---------- */
+.login{display:grid;grid-template-columns:1fr 1fr;border-radius:22px;overflow:hidden;background:var(--surface);max-width:980px;margin:32px auto 0;box-shadow:var(--shadow);border:1px solid var(--line)}
+.login .art{position:relative;min-height:420px}
+.login .art svg{position:absolute;inset:0;width:100%;height:100%}
+.login .art .quote{position:absolute;left:20px;right:20px;bottom:20px;color:#fff;font-family:var(--display);font-size:22px;line-height:1.3;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.login form{padding:clamp(22px,4vw,44px);display:grid;gap:14px;align-content:center}
+.login label{display:grid;gap:6px;font-size:14px;font-weight:600}
+.or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+@media (max-width:760px){.login{grid-template-columns:1fr}.login .art{min-height:200px}}
+
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:999px;font-size:14px;font-weight:600;z-index:60;box-shadow:var(--shadow)}
+@media (max-width:900px){.toast{bottom:100px}}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--forest);animation:rot .8s linear infinite;flex:none}
+@keyframes rot{to{transform:rotate(360deg)}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+
+<!-- icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><circle cx="12" cy="12" r="3.5"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></symbol>
+  <symbol id="i-life" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="m5.6 5.6 3.6 3.6M14.8 14.8l3.6 3.6M18.4 5.6l-3.6 3.6M9.2 14.8l-3.6 3.6"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="4"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4z"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 20h20zM12 10v4M12 17.5v.01"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+  <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></symbol>
+  <symbol id="i-logo" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M20 3v5M20 32v5M3 20h5M32 20h5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M20 10c7 4 7 16 0 20-7-4-7-16 0-20z" fill="var(--lime)" stroke="none"/><path d="M20 12v17" stroke="var(--canopy)" stroke-width="1.4"/></symbol>
+</svg>
+
+<div class="topbar">
+  <button class="brand" data-go="home" aria-label="WildLens home"><svg><use href="#i-logo"/></svg><b>WildLens</b></button>
+  <div class="top-acct" id="topAcct"></div>
+</div>
+
+<div class="app">
+  <aside class="side" aria-label="Sidebar">
+    <button class="brand" data-go="home" aria-label="WildLens home"><svg style="color:var(--forest)"><use href="#i-logo"/></svg><b>WildLens</b></button>
+    <nav class="nav" aria-label="Main">
+      <button data-go="home"><svg class="ico"><use href="#i-home"/></svg>Home</button>
+      <button data-go="guide"><svg class="ico"><use href="#i-book"/></svg>Field guide<span class="count" id="cGuide"></span></button>
+      <div class="nav-label">Your research</div>
+      <button data-go="recent"><svg class="ico"><use href="#i-clock"/></svg>Recent<span class="count" id="cRecent"></span></button>
+      <button data-go="saved"><svg class="ico"><use href="#i-heart"/></svg>Saved<span class="count" id="cSaved"></span></button>
+      <button data-go="rescue"><svg class="ico"><use href="#i-life"/></svg>Rescue reports<span class="count" id="cReports"></span></button>
+      <div class="nav-label">App</div>
+      <button data-go="settings"><svg class="ico"><use href="#i-gear"/></svg>Settings</button>
+    </nav>
+    <button class="btn ember block rescue-cta" data-go="rescue"><svg class="ico"><use href="#i-life"/></svg>Rescue an animal</button>
+    <div class="side-foot" id="sideAcct"></div>
+  </aside>
+
+  <main id="main">
+    <!-- HOME -->
+    <section class="view" id="v-home">
+      <div class="band">
+        <div class="wrap hero">
+          <div>
+            <p class="eyebrow" id="greet">Field station</p>
+            <h1 style="margin-top:12px">Photograph an animal. <em>Meet its whole story.</em></h1>
+            <p class="sub">WildLens identifies the species and likely sub-species from your photo, then opens its biology, its history with people and what it symbolizes. Found an animal in trouble? Report it in under a minute.</p>
+            <div class="tagline"><span>Identify</span><span>Learn</span><span>Explore</span><span>Rescue</span></div>
+          </div>
+          <div class="scan" id="scan">
+            <div class="drop" id="drop" role="button" tabindex="0" aria-label="Choose a photo to identify">
+              <div class="drop-empty" id="dropEmpty">
+                <span class="ring"><svg class="ico"><use href="#i-scan"/></svg></span>
+                <h3>Drop a photo to identify</h3>
+                <p>Or paste an image anywhere. JPEG, PNG, WebP or GIF.</p>
+              </div>
+            </div>
+            <div class="row-actions">
+              <label class="btn primary" for="fileIn"><svg class="ico"><use href="#i-image"/></svg>Choose photo</label>
+              <label class="btn" for="camIn"><svg class="ico"><use href="#i-camera"/></svg>Take photo</label>
+              <input id="fileIn" type="file" accept="image/*" class="sr" tabindex="-1">
+              <input id="camIn" type="file" accept="image/*" capture="environment" class="sr" tabindex="-1">
+            </div>
+            <div id="scanMsg" hidden></div>
+            <p class="hint">Identification runs on your own Claude account and asks for permission the first time.</p>
+          </div>
+        </div>
+      </div>
+      <div class="wrap stack">
+        <div class="stats" id="stats"></div>
+        <div class="actions">
+          <button class="action" data-act="identify"><span class="badge"><svg class="ico"><use href="#i-scan"/></svg></span><svg class="ico go"><use href="#i-arrow"/></svg><h3>Identify an animal</h3><p>Upload or take a photo and get the species, sub-species and confidence.</p></button>
+          <button class="action rescue" data-go="rescue"><span class="badge"><svg class="ico"><use href="#i-life"/></svg></span><svg class="ico go"><use href="#i-arrow"/></svg><h3>Rescue an animal</h3><p>Injured, trapped or orphaned? Send a photo, notes and your location.</p></button>
+          <button class="action" data-go="guide"><span class="badge"><svg class="ico"><use href="#i-book"/></svg></span><svg class="ico go"><use href="#i-arrow"/></svg><h3>Browse the field guide</h3><p>Biology, history and symbolism for every species you've met.</p></button>
+        </div>
+        <div class="split">
+          <div class="card">
+            <div class="sec-head card-pad" style="margin:0;padding-bottom:6px"><h2>Continue researching</h2><button class="linkbtn" data-go="recent">See all</button></div>
+            <div id="homeRecent"></div>
+          </div>
+          <div class="card card-pad">
+            <div class="sec-head"><h2>Field guide at a glance</h2></div>
+            <p class="hint" style="margin-bottom:12px">Conservation status of the species in your guide (IUCN Red List).</p>
+            <div id="statusMix"></div>
+            <div id="featured"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GUIDE -->
+    <section class="view" id="v-guide" hidden>
+      <div class="band"><div class="wrap">
+        <div class="page-head"><div><p class="eyebrow">Field guide</p><h1 style="margin-top:10px">Every species, one place</h1><p class="sub">Built-in profiles plus every animal you identify. Filter by group or conservation status.</p></div></div>
+      </div></div>
+      <div class="wrap stack">
+        <div class="toolbar">
+          <label class="search"><svg class="ico"><use href="#i-search"/></svg><input id="guideSearch" type="search" placeholder="Search name or scientific name" aria-label="Search the field guide"></label>
+          <div class="chips" id="guideCats"></div>
+          <select class="input" id="guideStatus" aria-label="Filter by status" style="width:auto;border-radius:999px;padding:9px 14px">
+            <option value="">Any status</option><option value="st-lc">Least Concern</option><option value="st-nt">Near Threatened</option><option value="st-vu">Vulnerable</option><option value="st-en">Endangered</option>
+          </select>
+        </div>
+        <div id="guideGrid"></div>
+      </div>
+    </section>
+
+    <!-- LORE -->
+    <section class="view" id="v-lore" hidden></section>
+
+    <!-- RECENT -->
+    <section class="view" id="v-recent" hidden>
+      <div class="band"><div class="wrap"><div class="page-head">
+        <div><p class="eyebrow">Your research</p><h1 style="margin-top:10px">Recent research</h1><p class="sub">Animals you identified or opened, newest first.</p></div>
+        <button class="btn" id="clearRecent" style="background:transparent;color:var(--canopy-ink);border-color:rgba(255,255,255,.25)">Clear history</button>
+      </div></div></div>
+      <div class="wrap stack">
+        <div class="toolbar"><label class="search"><svg class="ico"><use href="#i-search"/></svg><input id="recentSearch" type="search" placeholder="Search recent" aria-label="Search recent"></label><div class="chips" id="recentFilters"></div></div>
+        <div id="recentList" class="stack" style="padding-top:0"></div>
+      </div>
+    </section>
+
+    <!-- SAVED -->
+    <section class="view" id="v-saved" hidden>
+      <div class="band"><div class="wrap"><p class="eyebrow">Your research</p><h1 style="margin-top:10px">Saved animals</h1><p class="sub" id="savedSub">Your personal collection.</p></div></div>
+      <div class="wrap stack"><div id="savedGrid"></div></div>
+    </section>
+
+    <!-- RESCUE -->
+    <section class="view" id="v-rescue" hidden>
+      <div class="band ember-band"><div class="wrap">
+        <p class="eyebrow">Rescue</p>
+        <h1 style="margin-top:10px">Report an animal that needs help</h1>
+        <p class="sub">Add a photo, describe the animal's condition and share where it is. WildLens sends the report to your local wildlife authorities.</p>
+        <div class="safety"><svg class="ico"><use href="#i-alert"/></svg><div><b>Stay safe.</b> Keep your distance and don't handle wild animals that may bite, scratch or carry disease. If people are in danger, call your local emergency number first.</div></div>
+      </div></div>
+      <div class="wrap stack">
+        <div class="rescue-layout">
+          <form id="rescueForm" class="stack" style="padding-top:0" novalidate>
+            <div class="card step" id="st1">
+              <div class="step-head"><span class="step-n">1</span><div><h2>Photo of the animal</h2><p>One clear photo helps responders judge the situation.</p></div></div>
+              <div id="rsPhotoBox"></div>
+              <div class="row-actions">
+                <label class="btn primary" for="rsCam"><svg class="ico"><use href="#i-camera"/></svg>Take photo</label>
+                <label class="btn" for="rsFile"><svg class="ico"><use href="#i-image"/></svg>Choose photo</label>
+                <input id="rsCam" type="file" accept="image/*" capture="environment" class="sr" tabindex="-1">
+                <input id="rsFile" type="file" accept="image/*" class="sr" tabindex="-1">
+              </div>
+            </div>
+
+            <div class="card step" id="st2">
+              <div class="step-head"><span class="step-n">2</span><div><h2>Condition</h2><p>What's wrong, how urgent it is, and anything responders should know.</p></div></div>
+              <div class="field"><label for="rsSpecies">Animal <span class="opt">(if you know it)</span></label>
+                <div style="display:flex;gap:8px"><input class="input" id="rsSpecies" placeholder="e.g. Red fox, owl, turtle" autocomplete="off"><button class="btn" type="button" id="rsIdentify" hidden><svg class="ico"><use href="#i-sparkle"/></svg>Identify</button></div>
+              </div>
+              <div class="field"><span class="lbl">Situation</span><div class="chips" id="rsSituations"></div></div>
+              <div class="field"><span class="lbl">Urgency</span>
+                <div class="seg urgency" id="rsUrgency"><button type="button" data-v="Stable">Stable</button><button type="button" data-v="Urgent">Urgent</button><button type="button" data-v="Critical">Critical</button></div>
+              </div>
+              <div class="field"><label for="rsComment">Describe the animal's state</label>
+                <textarea class="input" id="rsComment" placeholder="e.g. Fox lying at the roadside, right back leg bleeding, breathing but not moving away when approached. Seen at 7:40 am."></textarea>
+                <span class="hint" id="rsCount">0 / 1000</span>
+              </div>
+              <div class="two">
+                <div class="field"><label for="rsName">Your name <span class="opt">(optional)</span></label><input class="input" id="rsName" autocomplete="name"></div>
+                <div class="field"><label for="rsPhone">Phone for follow-up <span class="opt">(optional)</span></label><input class="input" id="rsPhone" type="tel" autocomplete="tel"></div>
+              </div>
+            </div>
+
+            <div class="card step" id="st3">
+              <div class="step-head"><span class="step-n">3</span><div><h2>Location</h2><p>Use your device's location, or describe the place.</p></div></div>
+              <div id="rsLocBox"></div>
+              <div class="field"><label for="rsPlace">Landmarks or directions <span class="opt">(helps responders find the spot)</span></label><input class="input" id="rsPlace" placeholder="e.g. Next to the bus stop on King Fahd Rd, north side"></div>
+            </div>
+          </form>
+
+          <aside class="card summary" id="rsSummary"></aside>
+        </div>
+
+        <div class="card" id="rsResult" hidden></div>
+
+        <div>
+          <div class="sec-head"><h2>Your reports</h2><span class="hint" id="rsReportsHint"></span></div>
+          <div id="rsReports"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="view" id="v-settings" hidden>
+      <div class="band"><div class="wrap"><p class="eyebrow">App</p><h1 style="margin-top:10px">Settings</h1><p class="sub">Settings, saved animals, history and reports are kept in this browser.</p></div></div>
+      <div class="wrap stack">
+        <div class="settings">
+          <div class="card set-group"><h2>Appearance</h2>
+            <div class="set-row"><div>Theme<small>Auto follows your device.</small></div><div class="seg" id="themeSeg"><button data-v="light">Light</button><button data-v="dark">Dark</button><button data-v="auto">Auto</button></div></div>
+            <div class="set-row"><div>Reduce motion<small>Turn off animations and the scanning effect.</small></div><label class="switch"><input type="checkbox" id="setMotion"><span></span></label></div>
+            <div class="set-row"><div>Language<small>Interface translations are coming later.</small></div><select class="input" id="setLang" style="width:auto"><option>English</option><option>العربية</option><option>Español</option><option>Français</option><option>Deutsch</option></select></div>
+          </div>
+          <div class="card set-group"><h2>Privacy and history</h2>
+            <div class="set-row"><div>Keep research history<small>Show animals you open or identify under Recent.</small></div><label class="switch"><input type="checkbox" id="setHistory"><span></span></label></div>
+            <div class="set-row"><div>Delete all data in this browser<small>Saved animals, history, reports and settings.</small></div><button class="btn" id="wipeBtn">Delete…</button></div>
+            <div class="set-row" id="wipeConfirm" hidden><div><b>Delete everything?</b><small>This can't be undone.</small></div><div style="display:flex;gap:8px"><button class="btn" id="wipeNo">Cancel</button><button class="btn ember" id="wipeYes">Delete</button></div></div>
+          </div>
+          <div class="card set-group"><h2>Rescue reports</h2>
+            <div class="set-row"><div>Email delivery<small id="cfgMailHint"></small></div><span class="kv" id="cfgMail"></span></div>
+            <div class="set-row"><div>Recipients<small>Local authorities that receive reports.</small></div><span class="kv" id="cfgTo"></span></div>
+          </div>
+          <div class="card set-group"><h2>Notifications</h2>
+            <div class="set-row"><div>Product updates<small>Notes about new animals and features.</small></div><label class="switch"><input type="checkbox" id="setUpdates"><span></span></label></div>
+            <div class="set-row"><div>Email digest<small>A weekly summary of your research.</small></div><label class="switch"><input type="checkbox" id="setEmail"><span></span></label></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOGIN -->
+    <section class="view" id="v-login" hidden>
+      <div class="wrap">
+        <div class="login">
+          <div class="art" id="loginArt"></div>
+          <form id="loginForm" novalidate>
+            <div><h2 style="font-size:32px">Welcome back</h2><p class="hint" style="margin-top:6px">Demo sign-in. Any email and password work.</p></div>
+            <label>Email<input class="input" id="loginEmail" type="email" autocomplete="email" placeholder="you@example.com"></label>
+            <label>Password<input class="input" id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••"></label>
+            <button class="btn primary lg" type="submit">Log in</button>
+            <div class="or">or</div>
+            <button class="btn lg" type="button" id="googleBtn">Continue with Google</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<nav class="tabbar" aria-label="Main">
+  <button data-go="home"><svg class="ico"><use href="#i-home"/></svg>Home</button>
+  <button data-go="guide"><svg class="ico"><use href="#i-book"/></svg>Guide</button>
+  <button data-go="rescue" class="fab"><span class="bub"><svg class="ico"><use href="#i-life"/></svg></span>Rescue</button>
+  <button data-go="saved"><svg class="ico"><use href="#i-heart"/></svg>Saved</button>
+  <button data-go="settings"><svg class="ico"><use href="#i-gear"/></svg>Settings</button>
+</nav>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+/* ------------------------------------------------------------------
+   Rescue report delivery: NOT CONFIGURED YET.
+   While provider is "none", the Send button saves the report on this
+   device and shows the email that would be sent; nothing leaves the
+   browser. See README §7 "Rescue reports" for how to switch it on.
+------------------------------------------------------------------- */
+const RESCUE_CONFIG = {
+  provider: "none",          // "none" | "mailto" | "endpoint"
+  to: [],                    // recipient addresses, e.g. ["wildlife@your-authority.gov"]
+  endpoint: "",              // provider "endpoint": URL that accepts a multipart/form-data POST (e.g. a Formspree form or your own API)
+  subjectPrefix: "[WildLens Rescue]",
+  authorityName: "local wildlife authorities"
+};
+
+/* Original illustrated portraits. Each returns inner SVG for a 320x240 viewBox. */
+const ART = (() => {
+  const sky = (id, a, b) => `<defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="320" height="240" fill="url(#${id})"/>`;
+  const wrap = (inner, label) => `<svg viewBox="0 0 320 240" role="img" aria-label="Illustration of ${label}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">${inner}</svg>`;
+
+  const art = {
+    "red-fox": () => sky("gFox", "#F6DDB0", "#E8A96A") +
+      `<circle cx="258" cy="58" r="22" fill="#FBEBC8"/>
+       <path d="M0 175 Q80 150 160 168 T320 160 V240 H0Z" fill="#B7793C"/>
+       <path d="M0 200 Q100 185 190 198 T320 192 V240 H0Z" fill="#8C5A2B"/>
+       <path d="M40 205 l4 -26 M52 204 l-3 -22 M270 200 l3 -24 M282 202 l-4 -20" stroke="#6E4520" stroke-width="3" stroke-linecap="round"/>
+       <path d="M196 196 C258 204 290 160 266 124 C250 146 232 172 196 176Z" fill="#D8612A"/>
+       <path d="M266 124 C282 142 278 166 258 174 C264 158 266 142 266 124Z" fill="#FFF6EA"/>
+       <ellipse cx="170" cy="164" rx="42" ry="46" fill="#D8612A"/>
+       <ellipse cx="150" cy="162" rx="19" ry="32" fill="#FFF3E6"/>
+       <rect x="140" y="190" width="10" height="26" rx="4" fill="#2C1C12"/><rect x="160" y="192" width="10" height="24" rx="4" fill="#2C1C12"/>
+       <rect x="186" y="196" width="10" height="20" rx="4" fill="#2C1C12"/>
+       <path d="M128 90 L136 58 L152 84Z" fill="#D8612A"/><path d="M152 82 L168 56 L174 92Z" fill="#D8612A"/>
+       <path d="M134 84 L137 68 L145 83Z" fill="#3B2416"/><path d="M158 82 L166 66 L169 88Z" fill="#3B2416"/>
+       <ellipse cx="148" cy="108" rx="30" ry="24" fill="#D8612A"/>
+       <path d="M126 104 L92 118 L124 126Z" fill="#D8612A"/>
+       <path d="M124 116 L94 120 L126 132 L142 126Z" fill="#FFF3E6"/>
+       <circle cx="93" cy="118" r="4" fill="#1B120C"/>
+       <ellipse cx="140" cy="102" rx="3.5" ry="3" fill="#1B120C"/><circle cx="141" cy="101" r="1" fill="#fff"/>`,
+
+    "golden-eagle": () => sky("gEag", "#9CC3E0", "#DCEBF3") +
+      `<path d="M0 150 L50 90 L90 130 L140 70 L200 140 L250 100 L320 160 V240 H0Z" fill="#8FA7B8"/>
+       <path d="M140 70 L156 88 L148 90 L140 80 L132 92 L126 86Z" fill="#F4F8FB"/>
+       <path d="M80 240 L110 190 L220 185 L260 240Z" fill="#6D6A63"/><path d="M110 190 L220 185 L200 200 L120 204Z" fill="#8A867D"/>
+       <path d="M150 190 C120 150 130 90 170 78 C205 84 215 140 200 190Z" fill="#4E321D"/>
+       <path d="M160 188 C140 150 150 110 190 104 C214 130 214 168 200 190Z" fill="#3B2615"/>
+       <path d="M188 118 C200 140 204 166 198 188 L214 196 C222 160 214 128 188 118Z" fill="#2C1C10"/>
+       <circle cx="168" cy="80" r="22" fill="#5A3A20"/>
+       <path d="M160 62 C176 58 190 68 190 84 C182 76 172 72 160 72Z" fill="#C99A3E"/>
+       <path d="M150 78 L128 82 C126 90 134 94 140 90 L152 88Z" fill="#F2C14E"/>
+       <path d="M128 82 C124 88 128 94 134 92 L132 86Z" fill="#2A2522"/>
+       <circle cx="160" cy="76" r="3.4" fill="#2A1A0C"/><circle cx="161" cy="75" r="1" fill="#F6D48A"/>
+       <path d="M150 190 l-4 8 M158 190 l0 9 M166 190 l4 8 M184 190 l-3 8 M192 190 l1 9" stroke="#F2C14E" stroke-width="4" stroke-linecap="round"/>`,
+
+    "arabian-oryx": () => sky("gOryx", "#FBEFD2", "#F2D39B") +
+      `<circle cx="70" cy="60" r="26" fill="#FFF7E3"/>
+       <path d="M0 170 Q70 140 150 162 Q230 184 320 150 V240 H0Z" fill="#E7BE7E"/>
+       <path d="M0 205 Q120 180 220 200 T320 196 V240 H0Z" fill="#D8A661"/>
+       <ellipse cx="170" cy="146" rx="62" ry="28" fill="#F6F2EA"/>
+       <path d="M112 150 C120 168 138 172 150 170 L150 160Z" fill="#6A5442"/>
+       <path d="M116 146 L118 204 L126 204 L128 160Z" fill="#F6F2EA"/><path d="M118 184 L118 204 L126 204 L126 184Z" fill="#5A4636"/>
+       <path d="M140 160 L140 206 L148 206 L150 164Z" fill="#F6F2EA"/><path d="M140 186 L140 206 L148 206 L148 186Z" fill="#5A4636"/>
+       <path d="M200 162 L204 204 L212 204 L212 160Z" fill="#F6F2EA"/><path d="M204 184 L204 204 L212 204 L212 184Z" fill="#5A4636"/>
+       <path d="M220 150 L228 202 L236 202 L232 150Z" fill="#F6F2EA"/><path d="M228 184 L228 202 L236 202 L234 184Z" fill="#5A4636"/>
+       <path d="M230 138 C244 146 246 162 240 174" stroke="#5A4636" stroke-width="6" fill="none" stroke-linecap="round"/>
+       <path d="M110 150 C104 128 104 112 112 100 L128 108 C126 124 128 136 132 146Z" fill="#F6F2EA"/>
+       <path d="M96 96 C92 108 96 118 104 120 L118 118 L122 98 C114 92 102 92 96 96Z" fill="#F6F2EA"/>
+       <path d="M100 98 L104 118 L112 118 L110 96Z" fill="#2E2520"/><path d="M114 94 L118 110 L124 100Z" fill="#2E2520"/>
+       <path d="M110 100 L150 30" stroke="#3A302A" stroke-width="4" stroke-linecap="round"/>
+       <path d="M118 102 L160 34" stroke="#3A302A" stroke-width="4" stroke-linecap="round"/>
+       <path d="M118 96 l8 -8 l4 8Z" fill="#F6F2EA"/>
+       <circle cx="110" cy="104" r="2.2" fill="#F6F2EA"/>`,
+
+    "green-sea-turtle": () => sky("gTur", "#3FA3B8", "#12506A") +
+      `<path d="M60 0 L100 0 L40 240 L0 240Z M180 0 L210 0 L170 240 L130 240Z" fill="#fff" opacity=".07"/>
+       <path d="M0 214 Q60 200 120 212 T240 208 T320 214 V240 H0Z" fill="#D9C48E"/>
+       <path d="M30 214 c-4-20 6-34 2-48 M40 214 c6-18-2-30 4-44 M280 212 c-6-22 4-36 0-52 M292 212 c4-18-2-28 2-40" stroke="#3E7A45" stroke-width="4" fill="none" stroke-linecap="round"/>
+       <path d="M118 108 C80 86 58 96 50 110 C74 112 96 118 116 128Z" fill="#8E7B4E"/>
+       <path d="M204 108 C240 86 262 96 270 110 C246 112 224 118 206 128Z" fill="#8E7B4E"/>
+       <path d="M124 170 C104 182 98 196 104 204 C118 196 128 186 136 176Z" fill="#8E7B4E"/>
+       <path d="M196 170 C216 182 222 196 216 204 C202 196 192 186 184 176Z" fill="#8E7B4E"/>
+       <ellipse cx="160" cy="140" rx="54" ry="46" fill="#5F6F32"/>
+       <ellipse cx="160" cy="140" rx="46" ry="38" fill="#7A8740"/>
+       <path d="M160 108 L178 122 L172 144 L148 144 L142 122Z" fill="#8C9A4C" stroke="#4E5A28" stroke-width="2"/>
+       <path d="M148 144 L172 144 L176 166 L160 176 L144 166Z" fill="#8C9A4C" stroke="#4E5A28" stroke-width="2"/>
+       <path d="M142 122 L148 144 L144 166 L122 156 L118 128Z" fill="#8C9A4C" stroke="#4E5A28" stroke-width="2"/>
+       <path d="M178 122 L172 144 L176 166 L198 156 L202 128Z" fill="#8C9A4C" stroke="#4E5A28" stroke-width="2"/>
+       <ellipse cx="160" cy="88" rx="16" ry="18" fill="#9C8A58"/>
+       <circle cx="152" cy="84" r="2.6" fill="#1C1A12"/><circle cx="168" cy="84" r="2.6" fill="#1C1A12"/>
+       <circle cx="240" cy="50" r="5" fill="none" stroke="#CFEFF6" stroke-width="1.5"/><circle cx="250" cy="34" r="3" fill="none" stroke="#CFEFF6" stroke-width="1.5"/>`,
+
+    "bottlenose-dolphin": () => sky("gDol", "#8FD0E8", "#2C7FA8") +
+      `<path d="M0 150 Q40 140 80 150 T160 150 T240 150 T320 150 V240 H0Z" fill="#1F6A91"/>
+       <path d="M0 150 Q40 140 80 150 T160 150 T240 150 T320 150" stroke="#E8F7FC" stroke-width="3" fill="none" opacity=".7"/>
+       <path d="M60 170 C90 90 180 58 250 96 C232 94 214 96 200 102 C170 116 128 150 100 188Z" fill="#7F909C"/>
+       <path d="M76 176 C104 128 150 100 196 104 C160 118 124 146 98 186Z" fill="#DCE3E7"/>
+       <path d="M150 82 C154 62 166 50 182 46 C176 60 176 72 180 80Z" fill="#6B7C88"/>
+       <path d="M250 96 C262 96 272 100 276 106 C266 106 256 104 246 104Z" fill="#7F909C"/>
+       <path d="M60 170 C46 176 36 190 34 204 C48 196 58 192 70 192 C62 186 60 178 60 170Z" fill="#6B7C88"/>
+       <path d="M60 170 C58 186 64 200 76 208 C74 196 74 186 70 176Z" fill="#6B7C88"/>
+       <circle cx="232" cy="96" r="2.6" fill="#1C2328"/>
+       <path d="M236 104 Q246 108 258 106" stroke="#4F5E68" stroke-width="1.5" fill="none"/>
+       <path d="M20 200 q10 -6 20 0 M240 190 q12 -6 24 0 M180 214 q8 -5 16 0" stroke="#BDE6F4" stroke-width="2" fill="none"/>`,
+
+    "snow-leopard": () => sky("gSnow", "#C9D7E4", "#EEF3F7") +
+      `<path d="M0 120 L60 70 L110 110 L170 50 L240 110 L290 80 L320 100 V240 H0Z" fill="#A5B4C2"/>
+       <path d="M170 50 L190 68 L178 70 L170 62 L160 74 L152 66Z M60 70 L74 82 L64 84 L54 78Z" fill="#fff"/>
+       <path d="M0 176 L90 160 L200 170 L320 158 V240 H0Z" fill="#8C8A84"/><path d="M0 176 L90 160 L200 170 L320 158 V168 L200 180 L90 172 L0 188Z" fill="#E9EEF2"/>
+       <path d="M236 156 C290 150 300 190 268 200 C250 206 236 196 246 188 C262 186 276 180 266 168 C258 162 246 164 236 166Z" fill="#DCD8CE"/>
+       <ellipse cx="180" cy="150" rx="66" ry="26" fill="#DCD8CE"/>
+       <ellipse cx="98" cy="136" rx="30" ry="26" fill="#DCD8CE"/>
+       <path d="M76 118 L80 102 L92 114Z M104 112 L114 100 L118 116Z" fill="#CFCAC0"/>
+       <ellipse cx="84" cy="146" rx="12" ry="8" fill="#EDEAE3"/>
+       <path d="M80 142 L88 142 L84 147Z" fill="#8A6F6A"/>
+       <ellipse cx="86" cy="130" rx="3" ry="2.4" fill="#5B6A5E"/><ellipse cx="104" cy="130" rx="3" ry="2.4" fill="#5B6A5E"/>
+       <path d="M110 164 L96 176 L124 178 L128 166Z M200 166 L196 178 L224 178 L220 164Z" fill="#DCD8CE"/>
+       <g fill="none" stroke="#5E5D59" stroke-width="2.4">
+       <circle cx="150" cy="140" r="6"/><circle cx="172" cy="132" r="5"/><circle cx="196" cy="140" r="6"/><circle cx="218" cy="148" r="5"/>
+       <circle cx="160" cy="158" r="5"/><circle cx="186" cy="156" r="6"/><circle cx="130" cy="150" r="4"/><circle cx="210" cy="130" r="4"/>
+       <circle cx="262" cy="160" r="4"/><circle cx="282" cy="176" r="4"/><circle cx="270" cy="192" r="4"/></g>
+       <g fill="#5E5D59"><circle cx="100" cy="120" r="1.6"/><circle cx="92" cy="122" r="1.6"/><circle cx="110" cy="124" r="1.6"/><circle cx="118" cy="136" r="2"/></g>`,
+
+    "gray-wolf": () => sky("gWolf", "#1E2A44", "#3E5170") +
+      `<circle cx="236" cy="62" r="34" fill="#F1EEDD"/><circle cx="226" cy="54" r="6" fill="#E0DCC6"/><circle cx="246" cy="74" r="4" fill="#E0DCC6"/>
+       <g fill="#F1EEDD"><circle cx="40" cy="30" r="1.4"/><circle cx="90" cy="60" r="1.2"/><circle cx="150" cy="24" r="1.4"/><circle cx="300" cy="120" r="1.2"/><circle cx="20" cy="110" r="1"/></g>
+       <path d="M0 190 L40 150 L60 170 L90 130 L110 160 L0 240Z" fill="#1A2436"/>
+       <path d="M60 240 L130 176 L320 170 V240Z" fill="#2A3444"/>
+       <path d="M150 180 C140 140 146 110 162 96 L186 106 C196 130 206 160 214 182Z" fill="#8E949B"/>
+       <path d="M160 176 C156 146 160 124 172 110 C180 134 184 156 186 178Z" fill="#D4D6D8"/>
+       <path d="M200 176 C236 172 262 180 270 196 L200 196Z" fill="#8E949B"/>
+       <path d="M150 180 L148 212 L158 212 L160 184Z M196 180 L200 212 L210 212 L206 180Z" fill="#7A8087"/>
+       <path d="M162 96 C158 80 166 62 180 54 L218 34 L212 48 L200 58 C204 66 200 76 192 82 L186 106Z" fill="#8E949B"/>
+       <path d="M184 60 L176 40 L194 54Z" fill="#6F757C"/>
+       <path d="M200 58 L218 34 L214 50Z" fill="#2B2F34"/>
+       <path d="M192 82 L204 68 L212 52 L200 64Z" fill="#D4D6D8"/>
+       <circle cx="186" cy="66" r="2.2" fill="#E7C467"/>
+       <path d="M270 196 C284 192 296 196 300 204 C288 206 276 204 264 202Z" fill="#6F757C"/>`,
+
+    "african-elephant": () => sky("gEle", "#F7D59A", "#F2B36A") +
+      `<circle cx="80" cy="84" r="30" fill="#FBE3B0"/>
+       <path d="M0 176 Q160 160 320 178 V240 H0Z" fill="#C9A15A"/><path d="M0 208 Q160 192 320 206 V240 H0Z" fill="#B18846"/>
+       <path d="M262 176 L262 120" stroke="#4E3A26" stroke-width="5"/><path d="M226 116 Q262 96 302 116 Q262 124 226 116Z" fill="#6B7E3C"/>
+       <path d="M262 132 L242 120 M262 128 L284 118" stroke="#4E3A26" stroke-width="3"/>
+       <path d="M110 96 C110 70 150 58 196 64 C232 70 246 100 240 136 C236 160 226 170 214 172 L106 172 C98 150 100 118 110 96Z" fill="#8C8781"/>
+       <path d="M112 172 L110 216 L128 216 L130 170Z M146 172 L146 216 L164 216 L162 170Z M196 170 L198 214 L216 214 L214 168Z M222 166 L228 210 L244 210 L236 150Z" fill="#7D7872"/>
+       <path d="M244 110 C252 126 254 150 248 168" stroke="#7D7872" stroke-width="5" fill="none" stroke-linecap="round"/>
+       <path d="M70 80 C60 90 58 116 64 132 C78 118 92 110 108 108 L110 84 C96 76 80 74 70 80Z" fill="#8C8781"/>
+       <path d="M110 76 C90 60 58 66 50 94 C44 122 58 146 84 150 C98 150 108 138 112 124Z" fill="#9A958E"/>
+       <path d="M110 76 C92 66 66 72 60 96 C56 118 66 138 86 142 C98 140 106 130 108 120Z" fill="#B09088" opacity=".45"/>
+       <path d="M66 118 C58 140 52 170 58 196 C62 208 72 206 70 196 C66 174 72 148 80 128Z" fill="#8C8781"/>
+       <path d="M78 126 C68 130 56 128 48 120 C58 118 68 118 76 118Z" fill="#F4EEDC"/>
+       <circle cx="84" cy="100" r="3" fill="#2A2522"/>`,
+
+    "giant-panda": () => sky("gPan", "#DDEBCF", "#B8D4A0") +
+      `<g stroke="#5E8C3A" stroke-width="8" stroke-linecap="round"><path d="M34 240 V0"/><path d="M280 240 V10"/><path d="M300 240 V60"/></g>
+       <g stroke="#4C7A2E" stroke-width="2"><path d="M30 60 h8 M30 130 h8 M276 90 h8 M296 150 h8 M276 180 h8"/></g>
+       <g fill="#77A84B"><path d="M38 70 q30 -6 44 -24 q-30 4 -44 24Z"/><path d="M280 50 q-30 0 -48 -18 q30 0 48 18Z"/><path d="M300 110 q-26 6 -44 -8 q26 -6 44 8Z"/></g>
+       <path d="M0 206 Q160 190 320 206 V240 H0Z" fill="#6E9A45"/>
+       <ellipse cx="160" cy="160" rx="62" ry="54" fill="#F7F6F1"/>
+       <path d="M100 150 C96 176 104 204 124 214 L150 214 C140 192 136 170 140 152Z" fill="#1F1F22"/>
+       <path d="M220 150 C224 176 216 204 196 214 L170 214 C180 192 184 170 180 152Z" fill="#1F1F22"/>
+       <path d="M104 130 C120 118 200 118 216 130 C212 142 204 148 196 150 L124 150 C116 148 108 142 104 130Z" fill="#1F1F22"/>
+       <path d="M110 150 C96 150 88 128 104 116 L128 132Z M210 150 C224 150 232 128 216 116 L192 132Z" fill="#1F1F22"/>
+       <circle cx="160" cy="88" r="42" fill="#F7F6F1"/>
+       <circle cx="126" cy="54" r="15" fill="#1F1F22"/><circle cx="194" cy="54" r="15" fill="#1F1F22"/>
+       <ellipse cx="144" cy="86" rx="10" ry="14" transform="rotate(30 144 86)" fill="#1F1F22"/>
+       <ellipse cx="176" cy="86" rx="10" ry="14" transform="rotate(-30 176 86)" fill="#1F1F22"/>
+       <circle cx="146" cy="86" r="3" fill="#F7F6F1"/><circle cx="174" cy="86" r="3" fill="#F7F6F1"/>
+       <ellipse cx="160" cy="104" rx="7" ry="5" fill="#1F1F22"/>
+       <path d="M152 114 Q160 120 168 114" stroke="#1F1F22" stroke-width="2" fill="none"/>
+       <path d="M112 128 L112 70" stroke="#6C9C3E" stroke-width="6" stroke-linecap="round"/><path d="M112 76 q-18 -8 -24 -26 q20 6 24 26Z" fill="#77A84B"/>`,
+
+    "emperor-penguin": () => sky("gPen", "#B7D3EA", "#EAF3FA") +
+      `<path d="M0 120 L50 104 L70 120 L120 96 L150 112 L200 90 L260 116 L320 100 V160 H0Z" fill="#DCEAF4"/>
+       <path d="M0 160 Q160 150 320 160 V240 H0Z" fill="#F4F9FC"/><path d="M0 200 Q100 194 200 204 T320 200" stroke="#C9DCEA" stroke-width="2" fill="none"/>
+       <ellipse cx="160" cy="214" rx="46" ry="8" fill="#C9DCEA"/>
+       <path d="M122 120 C118 70 138 40 164 40 C190 40 206 70 202 120 C200 170 192 206 162 212 C132 206 124 170 122 120Z" fill="#20252E"/>
+       <path d="M138 124 C136 96 146 82 164 82 C182 82 190 98 188 124 C186 166 180 198 162 204 C144 198 140 166 138 124Z" fill="#FBFAF4"/>
+       <path d="M138 104 C140 88 150 80 164 82 C160 90 152 98 138 104Z" fill="#FBE7A6"/>
+       <path d="M188 104 C186 88 176 80 164 82 C168 90 176 98 188 104Z" fill="#FBE7A6"/>
+       <path d="M132 62 C128 74 132 90 142 98 C140 86 142 74 140 64Z" fill="#F5B83A"/>
+       <path d="M194 62 C198 74 194 90 184 98 C186 86 184 74 186 64Z" fill="#F5B83A"/>
+       <path d="M150 52 L98 66 L150 62Z" fill="#20252E"/><path d="M140 60 L104 65.5 L140 62.5Z" fill="#EE8E3A"/>
+       <circle cx="158" cy="50" r="2.4" fill="#5A6270"/>
+       <path d="M124 110 C110 130 108 160 114 180 C124 170 128 150 128 130Z M200 110 C214 130 216 160 210 180 C200 170 196 150 196 130Z" fill="#20252E"/>
+       <path d="M146 208 l-8 6 h16Z M174 208 l8 6 h-16Z" fill="#20252E"/>`,
+
+    "great-horned-owl": () => sky("gOwl", "#2B3252", "#4A4E6E") +
+      `<circle cx="64" cy="54" r="20" fill="#EFE9D2"/>
+       <path d="M0 196 C80 186 160 200 320 186 V240 H0Z" fill="#1C2034"/>
+       <path d="M60 176 C120 168 220 168 290 172 L290 186 C220 182 120 184 60 190Z" fill="#5A3E2A"/><path d="M280 174 L312 150" stroke="#5A3E2A" stroke-width="8" stroke-linecap="round"/>
+       <path d="M116 170 C104 130 110 80 160 70 C210 80 216 130 204 170Z" fill="#7A5638"/>
+       <path d="M132 168 C126 136 132 110 160 104 C188 110 194 136 188 168Z" fill="#C9A77A"/>
+       <g stroke="#5A3E2A" stroke-width="2"><path d="M140 124 h8 M156 118 h8 M172 124 h8 M140 140 h8 M156 136 h8 M172 142 h8 M146 156 h8 M166 156 h8"/></g>
+       <path d="M110 64 C114 40 126 34 134 32 C132 46 132 56 138 66Z M210 64 C206 40 194 34 186 32 C188 46 188 56 182 66Z" fill="#6A4A30"/>
+       <ellipse cx="160" cy="80" rx="46" ry="34" fill="#8C6644"/>
+       <circle cx="140" cy="80" r="17" fill="#C8905A"/><circle cx="180" cy="80" r="17" fill="#C8905A"/>
+       <circle cx="140" cy="80" r="11" fill="#F2B33A"/><circle cx="180" cy="80" r="11" fill="#F2B33A"/>
+       <circle cx="140" cy="80" r="5.5" fill="#15110C"/><circle cx="180" cy="80" r="5.5" fill="#15110C"/>
+       <circle cx="142" cy="78" r="1.6" fill="#fff"/><circle cx="182" cy="78" r="1.6" fill="#fff"/>
+       <path d="M154 90 L160 106 L166 90Z" fill="#3A2C22"/>
+       <path d="M146 64 L160 72 L174 64" stroke="#F1E6D0" stroke-width="3" fill="none"/>
+       <path d="M144 170 l-4 8 M150 170 l0 9 M170 170 l0 9 M176 170 l4 8" stroke="#D9B45A" stroke-width="3" stroke-linecap="round"/>`,
+
+    "bengal-tiger": () => sky("gTig", "#7FA35A", "#3F6A33") +
+      `<g fill="#2F5528"><path d="M0 0 Q30 60 0 120Z"/><path d="M320 20 Q280 80 320 150Z"/><path d="M0 150 Q50 190 0 240Z"/><path d="M320 170 Q270 200 320 240Z"/></g>
+       <g fill="#5E8B3E"><path d="M20 30 q40 10 60 -10 q-40 -10 -60 10Z"/><path d="M300 90 q-40 10 -60 -10 q40 -10 60 10Z"/><path d="M26 200 q40 0 54 -20 q-40 0 -54 20Z"/></g>
+       <path d="M102 60 C98 40 112 30 128 38 L130 60Z M218 60 C222 40 208 30 192 38 L190 60Z" fill="#E48A2F"/>
+       <path d="M108 56 C108 46 116 42 124 46 L124 58Z M212 56 C212 46 204 42 196 46 L196 58Z" fill="#F6E9D6"/>
+       <path d="M90 118 C88 70 122 44 160 44 C198 44 232 70 230 118 C228 160 198 196 160 200 C122 196 92 160 90 118Z" fill="#E48A2F"/>
+       <path d="M90 128 C96 164 122 190 160 196 C198 190 224 164 230 128 C214 150 194 158 176 150 L160 170 L144 150 C126 158 106 150 90 128Z" fill="#F6E9D6"/>
+       <path d="M130 70 C136 64 146 64 150 70 C140 70 134 72 130 70Z M190 70 C184 64 174 64 170 70 C180 70 186 72 190 70Z" fill="#F6E9D6"/>
+       <g fill="#1E1712">
+       <path d="M160 50 L152 56 L160 70 L168 56Z"/><path d="M140 52 L146 62 L136 64Z"/><path d="M180 52 L174 62 L184 64Z"/>
+       <path d="M92 104 L118 110 L94 114Z"/><path d="M228 104 L202 110 L226 114Z"/>
+       <path d="M96 130 L120 128 L100 138Z"/><path d="M224 130 L200 128 L220 138Z"/>
+       <path d="M104 150 L124 142 L112 158Z"/><path d="M216 150 L196 142 L208 158Z"/>
+       <path d="M106 84 L126 92 L108 94Z"/><path d="M214 84 L194 92 L212 94Z"/></g>
+       <ellipse cx="138" cy="102" rx="9" ry="6" fill="#F3D04A"/><ellipse cx="182" cy="102" rx="9" ry="6" fill="#F3D04A"/>
+       <ellipse cx="138" cy="102" rx="3" ry="5.5" fill="#1E1712"/><ellipse cx="182" cy="102" rx="3" ry="5.5" fill="#1E1712"/>
+       <path d="M148 128 L172 128 L160 142Z" fill="#C8756A"/>
+       <path d="M160 142 L160 152 M160 152 Q150 162 140 156 M160 152 Q170 162 180 156" stroke="#1E1712" stroke-width="2.4" fill="none"/>
+       <g fill="#1E1712"><circle cx="136" cy="148" r="1.4"/><circle cx="130" cy="142" r="1.4"/><circle cx="184" cy="148" r="1.4"/><circle cx="190" cy="142" r="1.4"/></g>`
+  };
+
+  const generic = () => sky("gGen", "#DCE8D2", "#AFC79C") +
+    `<circle cx="160" cy="120" r="58" fill="none" stroke="#2F5D3A" stroke-width="3" opacity=".5"/>
+     <path d="M160 70 C196 92 196 148 160 170 C124 148 124 92 160 70Z" fill="#2F5D3A" opacity=".75"/><path d="M160 76 V166" stroke="#DCE8D2" stroke-width="2"/>`;
+
+  let seq = 0;
+  return {
+    get(id, label) { const n = ++seq; return wrap((art[id] || generic)(), label || id).replace(/(id="|url\(#)(g[A-Za-z]+)/g, (m, a, b) => a + b + '_' + n); },
+    has(id) { return !!art[id]; }
+  };
+})();
+
+/* Draft profiles: written for the demo, not yet reviewed by a subject-matter expert. */
+const ANIMALS = [
+  { id: "red-fox", name: "Red Fox", sci: "Vulpes vulpes", sub: "Vulpes vulpes fulvus (American red fox) and ~45 others", cat: "Mammal",
+    facts: { Diet: "Omnivore: rodents, rabbits, birds, fruit, insects", Size: "45–90 cm body, 3–14 kg", Lifespan: "2–5 years wild", Range: "Northern Hemisphere; introduced to Australia", Status: "Least Concern" },
+    biology: [
+      "The red fox is the most widely distributed wild carnivore on Earth, found from the Arctic tundra to North African deserts and the centers of large cities. It is a small, lightly built member of the dog family, with a long bushy tail, black 'stockings' on its legs and, in most individuals, a white tail tip.",
+      "Foxes hunt mostly alone. Their hearing is tuned to low-frequency sounds, so they can locate a mouse moving under snow or long grass, then pounce from above in a high arc known as mousing. One study found that foxes pounce more successfully when facing roughly north-east, which suggests they may use the Earth's magnetic field to judge distance.",
+      "The species is an opportunist. It eats voles, rabbits, birds, eggs, insects, earthworms, fruit and carrion, and in towns it takes food waste. When food is plentiful, a fox buries the surplus in scattered caches and later finds them again using memory and smell.",
+      "Despite the name, coat color varies. Besides the familiar red, there are 'cross' foxes with a dark band across the shoulders and 'silver' foxes that are almost black. All belong to the same species and can be born in the same litter.",
+      "Red foxes mate in winter, when the vixen's screaming call is often heard at night. After about 52 days she gives birth to four to six kits in an underground den. Both parents bring food, and sometimes a non-breeding female from an earlier litter helps. Kits leave the den at around four weeks and disperse to find their own territories in autumn."
+    ],
+    history: [
+      "People and foxes have a long shared past. At Uyun al-Hammam in Jordan, a red fox was buried alongside a human about 16,500 years ago, one of the oldest known burials of a person with an animal.",
+      "Fox fur has been traded for centuries, and silver-fox pelts were among the most valuable. Fox farming began on Prince Edward Island, Canada, in the 1890s, and the industry spread across North America, Scandinavia and Russia.",
+      "In 1959 Soviet scientist Dmitry Belyaev began breeding farmed silver foxes in Siberia for tameness alone. Within a few dozen generations the foxes wagged their tails, sought human contact and developed floppy ears and piebald coats. The experiment, still running, is a key study of how domestication changes animals.",
+      "Fox hunting with hounds shaped rural life in Britain for centuries until it was banned in Scotland in 2002 and in England and Wales in 2004. In Australia, foxes released for sport in the 1800s spread across most of the continent and contributed to the decline and extinction of many small native mammals; control programs continue today.",
+      "Since the twentieth century, red foxes have settled in cities across Europe, North America and Japan. Urban foxes in Britain have been studied since the 1930s and now live at higher densities in some cities than in the countryside."
+    ],
+    symbolism: [
+      "Across Europe the fox is the classic trickster. Medieval tales of Reynard the Fox mocked nobles and clergy through a clever fox who outwits stronger animals, and Aesop's fables gave the world 'sour grapes' through a fox who scorns fruit it cannot reach.",
+      "In Japan the kitsune is a shape-shifting spirit and a messenger of Inari, the deity of rice and prosperity. Fox statues guard thousands of Inari shrines, and folklore says a kitsune gains a new tail with age and wisdom, up to nine.",
+      "Chinese folklore has the similar huli jing, a fox spirit that can take human form, sometimes as a seductive danger and sometimes as a loyal companion. In many Indigenous North American traditions the fox appears as a clever helper or teacher rather than a villain.",
+      "Writers use the fox for cleverness that stays just inside the rules and for survival against larger powers. Roald Dahl's Fantastic Mr Fox outwits three farmers, and in Antoine de Saint-Exupéry's The Little Prince the fox explains what it means to be 'tamed' and to care for someone.",
+      "In everyday language 'foxy' and 'sly as a fox' carry the same mix of admiration and suspicion. For authors, a fox is a quick way to signal wit, adaptability and a character who should not be underestimated."
+    ] },
+
+  { id: "golden-eagle", name: "Golden Eagle", sci: "Aquila chrysaetos", sub: "Aquila chrysaetos canadensis (North American)", cat: "Bird",
+    facts: { Diet: "Carnivore: hares, marmots, ground squirrels, carrion", Size: "Wingspan 1.8–2.3 m, 3–6.5 kg", Lifespan: "Up to 30+ years wild", Range: "North America, Eurasia, North Africa", Status: "Least Concern" },
+    biology: [
+      "Golden eagles hunt open country such as mountains, moorland, steppe and semi-desert. They soar for hours on rising air and stoop on prey in steep dives reported at more than 240 km/h. Feathered legs down to the toes separate them from sea eagles such as the bald eagle.",
+      "Adults are dark brown with a wash of golden feathers on the back of the head and neck, which gives the species its name. Females are larger than males, as in most birds of prey. Young birds have white patches on the wings and at the base of the tail that fade over their first four to five years.",
+      "Their eyesight is among the sharpest of any animal. A dense packing of light-sensitive cells and a second focal point in each eye let them spot a hare moving several kilometers away.",
+      "Their main prey are medium-sized mammals such as hares, rabbits, marmots and ground squirrels, but they also take birds, reptiles and, especially in winter, carrion. Pairs sometimes hunt together, one bird distracting prey while the other strikes, and golden eagles have been recorded attacking young deer and foxes.",
+      "Pairs hold large territories for years and reuse several cliff or tree nests, adding material each season until some nests are more than two meters deep. The female usually lays two eggs, about 41–45 days of incubation follow, and the older chick often kills the younger. Survivors fledge at around ten weeks."
+    ],
+    history: [
+      "Falconers across Central Asia have hunted foxes and wolves with golden eagles for at least a thousand years. Kazakh eagle hunters, known as berkutchi, keep the practice alive in western Mongolia and Kazakhstan, and the Golden Eagle Festival in Bayan-Ölgii has drawn visitors since 1999.",
+      "Eagles have marked power since antiquity. The aquila topped the standards of Roman legions, and later empires from Byzantium to Napoleonic France and Germany adopted eagle emblems.",
+      "In the nineteenth and twentieth centuries golden eagles were shot, trapped and poisoned across Europe and North America by people who saw them as a threat to sheep and game. In the United States, a 1962 amendment extended the Bald Eagle Protection Act to cover golden eagles, and most European countries gave them legal protection in the same era.",
+      "Some lost populations are being restored. Ireland reintroduced golden eagles to Donegal starting in 2001, and since 2018 birds from the Scottish Highlands have been moved to the south of Scotland to rebuild a small population there.",
+      "Modern threats include collisions with wind turbines, electrocution on power lines, lead poisoning from eating animals shot with lead ammunition, and continued illegal persecution in some areas."
+    ],
+    symbolism: [
+      "The golden eagle is often named as the national bird of Mexico, Germany, Albania and several other countries. Mexico's coat of arms shows an eagle on a cactus devouring a snake, recalling the Aztec legend of where to found their city, Tenochtitlan.",
+      "In Greek myth the eagle was the messenger of Zeus and carried his thunderbolts. Rome inherited the idea, and the eagle became shorthand for empire, authority and victory across Europe.",
+      "Many Plains and other Native American nations consider golden eagle feathers sacred and give them to honor acts of bravery and important life events. Because the birds are protected, the US National Eagle Repository supplies feathers from dead eagles to enrolled tribal members for religious use.",
+      "In Scotland it is often called the 'king of birds'. Poets from Tennyson onward have used the eagle for solitude, height and a wide view over the world.",
+      "Authors use the golden eagle for sovereignty, courage and clear sight, and for a perspective from above that sees what others miss."
+    ] },
+
+  { id: "arabian-oryx", name: "Arabian Oryx", sci: "Oryx leucoryx", sub: "No recognized sub-species", cat: "Mammal",
+    facts: { Diet: "Herbivore: grasses, herbs, tubers, desert melons", Size: "~1 m at shoulder, 65–70 kg", Lifespan: "Up to 20 years", Range: "Arabian Peninsula (reintroduced)", Status: "Vulnerable" },
+    biology: [
+      "The Arabian oryx is built for the desert. It is the smallest of the oryx species, standing about one meter at the shoulder. Its bright white coat reflects sunlight, while dark legs and face markings help it absorb warmth on cold desert mornings.",
+      "It can go weeks without drinking by getting water from plants, roots, tubers and dew. To save water it lets its body temperature rise during the hottest hours instead of sweating, then sheds the heat at night. In the midday heat it rests in shallow scrapes it digs under shrubs and trees.",
+      "Herds track rainfall across huge distances. Oryx appear to sense distant storms and move toward the new growth that follows, sometimes traveling tens of kilometers overnight. Wide, splayed hooves help them walk on soft sand.",
+      "Herds usually hold two to fifteen animals of both sexes, with a dominance hierarchy among males and females. Both sexes carry long, nearly straight horns up to about 70 cm, used mainly in ritual sparring that rarely causes injury.",
+      "Females give birth to a single calf after about eight months of pregnancy. Calves can be born at any time of year, and they stand and follow the herd within hours."
+    ],
+    history: [
+      "Bedouin hunters took oryx for meat and hides for centuries without endangering the species. After the Second World War, motor vehicles and modern rifles allowed hunting parties to chase herds across the open desert, and numbers collapsed. The last known wild oryx was shot in Oman in 1972.",
+      "Ten years earlier, a project known as Operation Oryx had captured three wild animals in what is now Yemen. Together with animals from London Zoo and private herds in Kuwait and Saudi Arabia, they formed a 'World Herd' at the Phoenix Zoo in Arizona, which became the main source for later reintroductions.",
+      "Oryx returned to the wild in Oman in 1982, and later to Saudi Arabia, the UAE, Jordan and Israel. In 2011 it became the first animal to move from Extinct in the Wild back to Vulnerable on the IUCN Red List.",
+      "Recovery has not been smooth. Poaching for live capture hit the Oman herd from 1996, and in 2007 Oman's Arabian Oryx Sanctuary became the first site ever removed from the UNESCO World Heritage List after the protected area was cut by about 90 percent.",
+      "Today the wild population is estimated at over a thousand animals, with several thousand more in managed herds across the Arabian Peninsula."
+    ],
+    symbolism: [
+      "Seen in profile, the two horns can look like one, which is one explanation offered for the unicorn legend that reached Europe through ancient travelers' accounts.",
+      "In classical Arabic poetry the eyes of the maha, the wild oryx, are a standard image of beauty, and the word remains a popular name for girls across the Arab world.",
+      "In the Gulf the oryx symbolizes endurance and national heritage. It is Qatar's national animal, appears in the logo of Qatar Airways and was Orry, the mascot of the 2006 Asian Games in Doha.",
+      "For conservationists the Arabian oryx is a symbol of hope and of the work needed to keep a rescued species safe. Its return from extinction in the wild is one of the most cited success stories in wildlife protection."
+    ] },
+
+  { id: "green-sea-turtle", name: "Green Sea Turtle", sci: "Chelonia mydas", sub: "East Pacific green turtle (sometimes Chelonia mydas agassizii)", cat: "Reptile",
+    facts: { Diet: "Adults herbivore: seagrass, algae", Size: "Shell 0.8–1.2 m, 65–190 kg", Lifespan: "70+ years", Range: "Tropical and subtropical oceans", Status: "Endangered" },
+    biology: [
+      "The green sea turtle is named for the green color of its body fat rather than its shell, which is olive to brown. It is one of the largest hard-shelled sea turtles. Unlike land tortoises, it cannot pull its head or flippers into its shell.",
+      "Adults are the only sea turtles that live mainly on plants. They graze seagrass meadows and algae with a finely serrated lower jaw, keeping the meadows short and healthy in the same way cattle maintain a pasture.",
+      "Hatchlings dig out of the nest at night and race to the sea. They spend their first years drifting in the open ocean, eating jellyfish and other small animals among floating seaweed, a period researchers call the 'lost years'. Young turtles later move to coastal feeding grounds and switch to plants.",
+      "Green turtles mature slowly, at 20 to 40 years old. Females return to the beach where they hatched, often swimming more than 2,000 km, and appear to navigate using the Earth's magnetic field. They lay several clutches of about 100 eggs in a season, then rest for two to four years.",
+      "Sand temperature sets the sex of the hatchlings: warmer nests produce more females. In Hawaiʻi, green turtles also haul out to bask on beaches during the day, a behavior seen in very few other sea turtle populations."
+    ],
+    history: [
+      "Columbus named the Cayman Islands 'Las Tortugas' in 1503 after the great numbers of turtles he saw. Green turtles became a staple food for sailors because they could be kept alive on deck for weeks.",
+      "From the 1600s onward, turtles were harvested in huge numbers for meat, oil and soup, and shipped live to Europe. Turtle soup became a luxury in Britain, and its cost led cooks to invent 'mock turtle soup', which in turn inspired Lewis Carroll's Mock Turtle in Alice's Adventures in Wonderland.",
+      "Scientist Archie Carr began studying nesting turtles at Tortuguero, Costa Rica, in the 1950s and helped found a conservation group there in 1959. Tortuguero became a national park in 1975 and its green turtle colony has grown since protection began.",
+      "International commercial trade in sea turtles was banned when they were listed on Appendix I of CITES in the 1970s. Nesting beach protection, turtle-excluder devices on shrimp nets and community programs have helped some populations recover.",
+      "New threats include fishing bycatch, plastic and other debris, coastal development, and a tumor disease called fibropapillomatosis. Warming is also changing sex ratios: a 2018 study on the northern Great Barrier Reef found that more than 99 percent of young turtles were female."
+    ],
+    symbolism: [
+      "In many Pacific and Caribbean cultures the sea turtle represents long life, navigation and the link between land and sea.",
+      "The honu of Hawaiʻi is a family guardian spirit, or ʻaumakua, for some families. Legend tells of Kauila, a turtle at Punaluʻu who could take the form of a girl and watched over the children who played there.",
+      "For many Torres Strait Islander and coastal Aboriginal communities in Australia, the green turtle is a central food, totem and part of ceremony, and traditional hunting is managed through community-led plans.",
+      "Turtles in general carry the world on their backs in several mythologies, from the Hindu Kurma avatar to the 'Turtle Island' of many North American Indigenous traditions. Writers often borrow that image of patience, endurance and an ancient creature that has outlasted empires."
+    ] },
+
+  { id: "bottlenose-dolphin", name: "Bottlenose Dolphin", sci: "Tursiops truncatus", sub: "Tursiops truncatus truncatus (common bottlenose)", cat: "Mammal",
+    facts: { Diet: "Carnivore: fish, squid, crustaceans", Size: "2–4 m, 150–650 kg", Lifespan: "40–50 years", Range: "Temperate and tropical seas worldwide", Status: "Least Concern" },
+    biology: [
+      "Bottlenose dolphins find prey with echolocation, sending out clicks and reading the returning echoes to build a picture of their surroundings. They can detect a fish buried in sand and tell different objects apart by sound alone.",
+      "Each dolphin develops a signature whistle in its first months of life that works much like a name. Other dolphins copy that whistle to call a particular individual, and dolphins can recognize the signature whistles of companions after decades apart.",
+      "Scientists recognize coastal and offshore forms that differ in size, diet and diving behavior. A related species, the Indo-Pacific bottlenose dolphin, lives in the Indian Ocean and western Pacific.",
+      "They live in fluid groups whose members change from day to day, a pattern called fission-fusion. In Shark Bay, Australia, males form long-term alliances, and alliances of alliances, to compete for females.",
+      "Hunting methods vary by place and are passed from mothers to calves. Some Shark Bay dolphins carry sponges to protect their snouts while searching the seabed, dolphins in South Carolina drive fish onto mudbanks and briefly strand themselves to catch them, and in Laguna, Brazil, dolphins herd fish toward net fishers in a partnership that has lasted for generations.",
+      "Calves are born after about a year of pregnancy and nurse for 18 months or longer, staying with their mother for three to six years. Dolphins sleep with one half of the brain at a time, which lets them keep surfacing to breathe."
+    ],
+    history: [
+      "Aristotle described dolphins as air-breathing and giving live birth more than 2,000 years ago, long before they were classed as mammals. Roman writers such as Pliny the Elder recorded stories of dolphins helping fishermen and befriending children.",
+      "The first oceanarium to keep bottlenose dolphins, Marineland in Florida, opened in 1938. The 1960s television series Flipper made the species famous and helped drive the growth of dolphin shows worldwide.",
+      "Research since the 1960s on cognition and communication, including controversial early work by John Lilly, made the bottlenose the best-studied dolphin. Studies have since shown that they recognize themselves in mirrors and understand simple artificial grammars.",
+      "Since 1959 the US Navy has trained bottlenose dolphins to find sea mines and lost equipment, using their echolocation in ways machines struggle to match.",
+      "Public concern about captivity has grown. Several countries, including India in 2013, have banned dolphin shows. In the wild, bottlenose dolphins face fishing bycatch, pollution and boat traffic, and in the United States they are protected under the Marine Mammal Protection Act of 1972."
+    ],
+    symbolism: [
+      "In Greek myth, dolphins carried the poet Arion to safety and served Poseidon, and Apollo took a dolphin's form to found his oracle at Delphi. Minoan frescoes at Knossos show dolphins leaping across palace walls.",
+      "Sailors read them as a sign of good luck and a guide to shore. Early Christian art used the dolphin as a symbol of rescue and of Christ guiding souls.",
+      "In heraldry the dolphin was a common charge, and the French title Dauphin, given to the heir to the throne, came from the dolphin on the arms of the Dauphiné region.",
+      "Today dolphins stand for intelligence, play, freedom and friendship between people and wild animals. They are also used as a symbol of ocean health, which makes them a frequent face of marine conservation campaigns."
+    ] },
+
+  { id: "snow-leopard", name: "Snow Leopard", sci: "Panthera uncia", sub: "No widely agreed sub-species", cat: "Mammal",
+    facts: { Diet: "Carnivore: blue sheep, ibex, marmots", Size: "1–1.3 m body plus ~1 m tail, 22–55 kg", Lifespan: "15–18 years", Range: "Mountains of Central and South Asia", Status: "Vulnerable" },
+    biology: [
+      "Snow leopards live at 3,000–4,500 m in the mountains of 12 countries, from the Himalaya and Tibetan Plateau to the Altai and Tian Shan. Their long, thick tail helps them balance on steep rock and wraps around the face like a scarf while they sleep.",
+      "Every part of the body is built for cold. Smoky-gray fur with dark rosettes grows up to 12 cm long on the belly, the nasal cavity is enlarged to warm thin, cold air, and wide, furred paws act as snowshoes. Powerful hind legs let them leap several meters across ravines.",
+      "Their main prey are blue sheep (bharal) and Siberian ibex, but they also hunt marmots, pikas and birds. A snow leopard can kill prey up to three times its own weight and may feed on a single large kill for several days.",
+      "Unlike other big cats they cannot roar. They communicate with chuffs, moans and mews, and leave scent marks and scrapes along ridgelines and cliff bases where other snow leopards will pass.",
+      "Females give birth to two or three cubs after about 95 to 100 days, in a rocky den lined with fur from the mother's belly. The cubs stay with her for 18 to 22 months, learning to hunt on steep terrain."
+    ],
+    history: [
+      "Western science described the species in 1775. Its old English name, 'ounce', came through French from a word once used for the lynx, and the scientific name uncia preserves it.",
+      "The cat is so hard to see that wildlife biologist George Schaller took some of the first photographs of a wild snow leopard in northern Pakistan in 1970. Peter Matthiessen's book The Snow Leopard (1978) describes a Himalayan trek with Schaller in which Matthiessen never saw one.",
+      "Close footage of a snow leopard hunting in the wild was first shown to a global audience in the BBC series Planet Earth in 2006. Camera traps and GPS collars have since transformed what is known about the species.",
+      "Poaching for fur and bones, loss of prey and conflict with herders reduced numbers. In 2013 the 12 range countries agreed on a joint protection program in Bishkek, Kyrgyzstan, and community schemes now pay herders for livestock losses, build predator-proof corrals and train locals as rangers.",
+      "The IUCN moved the snow leopard from Endangered to Vulnerable in 2017. The wild population is estimated at roughly 4,000 to 6,500 animals, though accurate counts remain difficult."
+    ],
+    symbolism: [
+      "Known in Central Asia as the 'ghost of the mountains', the snow leopard is a national symbol of Kyrgyzstan and appears on the coats of arms of Almaty and of Tatarstan, where a winged white snow leopard is shown.",
+      "In the Soviet Union, mountaineers who climbed all of the country's 7,000-meter peaks earned the 'Snow Leopard' award, and the title is still used for that achievement.",
+      "In Buddhist and older traditions of the Himalaya, snow leopards are associated with mountain deities and spirits that guard the high peaks. In parts of Ladakh people believed that harming one could bring misfortune.",
+      "For writers the snow leopard stands for things that are rare, elusive and worth the search, and for the quiet presence of wild places that most people will never see."
+    ] },
+
+  { id: "gray-wolf", name: "Gray Wolf", sci: "Canis lupus", sub: "Canis lupus lupus (Eurasian wolf) and ~30 others", cat: "Mammal",
+    facts: { Diet: "Carnivore: deer, elk, moose, bison, small mammals", Size: "1–1.6 m body, 30–80 kg", Lifespan: "6–8 years wild", Range: "North America and Eurasia", Status: "Least Concern" },
+    biology: [
+      "The gray wolf is the largest wild member of the dog family. Size and color vary widely across its range, from small, pale wolves of the Arabian deserts to large Arctic wolves that are almost pure white. Despite the name, coats can be gray, tan, black or white.",
+      "Wolves live in packs that are usually a breeding pair and their offspring from the last few years. They hunt cooperatively and can travel more than 50 km in a day. Most hunts of large prey fail, so they tend to target young, old or weakened animals, and a hungry wolf can eat about 10 kg of meat at once.",
+      "Howling holds territories and reunites pack members. Wolves also communicate with scent marks, body posture and facial expressions, which helps keep order in the pack without much fighting.",
+      "A pack usually produces one litter a year. After about 63 days the female gives birth to four to six pups in a den, and the whole pack helps feed them. Young wolves leave at one to three years old and can disperse hundreds of kilometers; one radio-collared wolf, OR-7, walked more than 1,600 km from Oregon into California in 2011.",
+      "Wolves were reintroduced to Yellowstone National Park in 1995. Their return changed how elk used the landscape, and many researchers link it to the recovery of streamside willows and aspens, although how strong that effect is remains debated."
+    ],
+    history: [
+      "Wolves were the first animal domesticated by humans; all dogs descend from a wolf population that lived alongside people more than 15,000 years ago.",
+      "As farming spread, wolves became enemies of herders. Bounties and hunting drove them out of Britain by the eighteenth century and from most of Western Europe soon after. In the United States, government programs, traps and poison eliminated wolves from nearly all of the lower 48 states by the 1930s, except northern Minnesota.",
+      "Attitudes changed in the twentieth century. Wolves were protected under the US Endangered Species Act in the 1970s, and 31 wolves from Canada were released in Yellowstone and central Idaho in 1995 and 1996. In Europe, wolves spread back naturally from Italy into France in the 1990s and from Poland into Germany, where the first new litter was recorded in 2000.",
+      "Their return has brought renewed conflict over livestock, and policies keep changing. In 2025 European countries lowered the wolf's protection under the Bern Convention from 'strictly protected' to 'protected', allowing more culling in some areas."
+    ],
+    symbolism: [
+      "Rome's founding legend features a she-wolf nursing Romulus and Remus. In Norse myth Odin keeps two wolves, Geri and Freki, while the monstrous wolf Fenrir will swallow him at the end of the world.",
+      "Turkic and Mongol origin stories trace their peoples to a wolf ancestor; a gray wolf, Asena, appears in the founding legend of the Göktürks. For many Indigenous peoples of North America the wolf is a teacher of loyalty, family and cooperation.",
+      "European fairy tales such as Little Red Riding Hood and The Three Little Pigs made the wolf a symbol of danger in the forest, and werewolf legends added fear of the beast inside a person.",
+      "Modern writers often reverse that image. Jack London's The Call of the Wild and White Fang and Kipling's Jungle Book, with its wolf pack led by Akela, present wolves as loyal, intelligent and bound by law. Today the wolf stands for wildness, loyalty to one's group and the 'lone wolf' who goes their own way."
+    ] },
+
+  { id: "african-elephant", name: "African Elephant", sci: "Loxodonta africana", sub: "Savanna elephant; forest elephant is now a separate species", cat: "Mammal",
+    facts: { Diet: "Herbivore: grasses, leaves, bark, fruit", Size: "Up to 4 m at shoulder, 6,000 kg", Lifespan: "60–70 years", Range: "Sub-Saharan Africa", Status: "Endangered" },
+    biology: [
+      "The savanna elephant is the largest land animal. It eats up to 150 kg of plants a day and drinks up to 200 liters of water. Its trunk, a fusion of nose and upper lip, holds over 40,000 muscles and can lift a log or pick a single fruit.",
+      "Its large ears, shaped roughly like the African continent, are full of blood vessels and release heat when flapped. Both males and females usually grow tusks, which are enlarged incisor teeth. Elephants grow six sets of molars in a lifetime, and when the last set wears down they can no longer chew well.",
+      "Herds are led by the oldest female, whose memory of water sources and danger can decide whether a family survives a drought. Young males leave the family at around 12 to 15 years old and join loose bachelor groups. Adult males periodically enter musth, a state of high hormones and aggression.",
+      "Elephants communicate with low rumbles, many below the range of human hearing, that carry for kilometers, and they can sense ground vibrations through their feet. A 2024 study suggested that wild elephants address each other with individual name-like calls.",
+      "Pregnancy lasts about 22 months, the longest of any land mammal, and a newborn calf weighs about 100 kg. By digging waterholes, spreading seeds in their dung and opening up thick bush, elephants shape entire ecosystems."
+    ],
+    history: [
+      "Elephants have served in war and pageantry since antiquity. The Carthaginian general Hannibal crossed the Alps with war elephants in 218 BC, most likely a smaller North African population that is now extinct.",
+      "Ivory has been traded for thousands of years. In the nineteenth century, demand for piano keys, billiard balls and ornaments drove massive hunting across Africa and fueled caravan trade through ports such as Zanzibar.",
+      "In the 1980s poaching roughly halved Africa's elephant population, leading to the 1989 CITES ban on international ivory trade. A new poaching surge between 2008 and 2016 prompted many countries, including China in 2017, to close domestic ivory markets. The Great Elephant Census of 2016 found that savanna elephant numbers fell by about 30 percent between 2007 and 2014.",
+      "In 2021 the IUCN assessed African elephants as two species for the first time, listing the savanna elephant as Endangered and the forest elephant as Critically Endangered.",
+      "Today the main pressures are habitat loss and conflict with farmers. Solutions range from wildlife corridors to fences hung with beehives, which elephants avoid."
+    ],
+    symbolism: [
+      "Across Africa the elephant stands for strength, wisdom, patience and leadership. It is the emblem of Côte d'Ivoire, whose name means 'Ivory Coast', and elephant tusks frame the coat of arms of South Africa.",
+      "In many African folktales the elephant is the chief or king of the animals, powerful but often outwitted by smaller, quicker creatures such as the hare.",
+      "The phrase 'an elephant never forgets' reflects real research on elephant memory. Children's stories from Babar to Dumbo made elephants symbols of gentleness and family.",
+      "Writers use elephants for memory, grief and loyalty, since they are known to linger over and touch the bones of their dead. 'The elephant in the room' has become shorthand for a large problem nobody wants to mention."
+    ] },
+
+  { id: "giant-panda", name: "Giant Panda", sci: "Ailuropoda melanoleuca", sub: "Qinling panda (Ailuropoda melanoleuca qinlingensis)", cat: "Mammal",
+    facts: { Diet: "Almost all bamboo (~99%)", Size: "1.2–1.9 m, 70–120 kg", Lifespan: "~20 years wild", Range: "Mountains of central China", Status: "Vulnerable" },
+    biology: [
+      "The giant panda is a true bear, despite a long scientific debate that once linked it with raccoons. It lives in cool, wet bamboo forests at 1,200–3,400 m in the mountains of Sichuan, Shaanxi and Gansu.",
+      "Pandas have a carnivore's short gut but eat bamboo for 10–16 hours a day, getting through 12–38 kg of it. They digest only about a fifth of what they eat, so they save energy by moving little and keeping a low metabolism. An enlarged wrist bone works like a thumb for gripping stems.",
+      "The black-and-white coat is thought to work as camouflage, helping pandas blend into both snowy and shaded forest, while the dark eye patches and ears may help individuals recognize each other.",
+      "Pandas live alone and communicate mostly through scent. Males sometimes do a handstand against a tree to place their scent mark as high as possible.",
+      "Females are fertile for only two or three days a year. Cubs weigh about 100 g at birth, roughly 1/900 of their mother's weight, and are born pink and nearly hairless. Twins are common, but in the wild a mother usually raises only one."
+    ],
+    history: [
+      "Pandas appear in old Chinese texts, and a panda skull was found in the tomb of Empress Dowager Bo of the Han dynasty, who died in 155 BC.",
+      "Western science first described the panda in 1869, after the French missionary Armand David sent a skin to Paris. In 1936 American Ruth Harkness brought a live cub, Su Lin, to the United States, sparking worldwide fascination.",
+      "China's 'panda diplomacy' has given or loaned pandas to other countries since the 1950s. After President Nixon's 1972 visit, Ling-Ling and Hsing-Hsing went to the National Zoo in Washington. Since the 1980s pandas have been loaned rather than given, and fees fund conservation in China.",
+      "The Wolong reserve opened in 1963, and a network of reserves and bamboo corridors followed. The 2014 national survey counted about 1,860 wild pandas, and the IUCN moved the species from Endangered to Vulnerable in 2016. In 2021 China created the Giant Panda National Park, linking many separate habitats."
+    ],
+    symbolism: [
+      "The panda is China's national treasure and has been the logo of the WWF since 1961, inspired by Chi Chi, a panda at London Zoo.",
+      "Its black and white coat is often linked to yin and yang, the balance of opposites in Chinese philosophy, and it has come to represent peace and gentleness.",
+      "Pandas have been mascots for major events, including Jingjing at the 2008 Beijing Olympics and Bing Dwen Dwen at the 2022 Winter Olympics. Films such as Kung Fu Panda made the animal a global icon.",
+      "For conservation the panda is the best-known success story, though some critics note that its fame draws attention from less charismatic species. Writers use it for innocence, patience and fragile survival."
+    ] },
+
+  { id: "emperor-penguin", name: "Emperor Penguin", sci: "Aptenodytes forsteri", sub: "No recognized sub-species", cat: "Bird",
+    facts: { Diet: "Carnivore: fish, krill, squid", Size: "1.1–1.3 m tall, 22–45 kg", Lifespan: "~20 years", Range: "Antarctica", Status: "Near Threatened" },
+    biology: [
+      "The emperor is the largest penguin and the only one that breeds during the Antarctic winter. Dense, overlapping feathers, a thick fat layer and blood vessels that recycle heat in the flippers and legs let it survive temperatures below −40°C and winds above 100 km/h.",
+      "In autumn, colonies walk up to 100 km or more across the sea ice to stable breeding sites. The female lays a single egg in May or June, passes it to the male and returns to the sea to feed.",
+      "Males balance the egg on their feet under a fold of skin for about 65 days without eating. By the time the female returns they may have fasted for about four months and lost up to 40 percent of their body weight. If the chick hatches before she arrives, the male feeds it a milky secretion from his throat.",
+      "To survive the winter, thousands of males huddle together. The huddle moves slowly as birds on the cold outside edge shuffle inward, so everyone takes turns in the warm center.",
+      "Emperors dive deeper than any other bird, recorded beyond 500 m, and can stay underwater for more than 20 minutes while hunting fish, krill and squid."
+    ],
+    history: [
+      "The species was described in 1844 and named after Johann Reinhold Forster, a naturalist on Captain Cook's second voyage. The first colony was only discovered in 1902 by Scott's Discovery expedition at Cape Crozier.",
+      "In 1911, three men from Scott's later expedition crossed to Cape Crozier in the dark of midwinter to collect emperor eggs, hoping they would shed light on bird evolution. Apsley Cherry-Garrard described the journey in The Worst Journey in the World.",
+      "Since 2009 scientists have counted colonies from space by spotting the brown guano stains they leave on the ice. Satellite surveys have found more than 60 colonies and an estimated population of around half a million birds.",
+      "Loss of sea ice is now the main threat. In 2022, early ice break-up caused breeding failure at several colonies in the Bellingshausen Sea, and the United States listed the species as threatened that same year."
+    ],
+    symbolism: [
+      "Emperors stand for endurance, devotion and fatherhood, especially since the 2005 documentary March of the Penguins and the animated film Happy Feet.",
+      "They have also become a symbol of climate change, because their breeding depends on stable sea ice and their numbers are expected to fall as it shrinks.",
+      "Studies project that, without strong cuts in greenhouse gas emissions, most emperor colonies could be close to disappearing by the end of the century. That forecast has made the emperor a recurring image in climate campaigns and reports.",
+      "As the iconic animal of Antarctica, the emperor appears on stamps, coins and emblems linked to polar research. Writers use it for survival against impossible odds and for quiet, collective care."
+    ] },
+
+  { id: "great-horned-owl", name: "Great Horned Owl", sci: "Bubo virginianus", sub: "Bubo virginianus virginianus (eastern) and ~15 others", cat: "Bird",
+    facts: { Diet: "Carnivore: rabbits, rodents, skunks, birds", Size: "46–63 cm long, wingspan 1–1.5 m", Lifespan: "Up to 13 years wild", Range: "North, Central and South America", Status: "Least Concern" },
+    biology: [
+      "The 'horns' are feather tufts, not ears. Its real ear openings sit at different heights on the head, so a sound reaches each ear at a slightly different time, helping it pinpoint prey in complete darkness.",
+      "Its large eyes are tube-shaped and cannot move in their sockets, so the owl turns its whole head instead, up to about 270 degrees. Plumage ranges from pale gray in the Arctic to dark brown in Pacific forests.",
+      "Soft-edged flight feathers make it almost silent, and its powerful grip can kill prey heavier than itself. It has one of the broadest diets of any American bird of prey: rabbits, rodents, skunks, waterbirds, other owls and hawks, and even scorpions. Owls have a weak sense of smell, so skunk spray does not deter them.",
+      "It is one of the earliest birds to nest, laying eggs in January or February. It does not build its own nest, but takes over old hawk or crow nests, tree hollows or cliff ledges. Pairs call to each other in deep hooting duets, the female's voice higher than the male's."
+    ],
+    history: [
+      "The species was first described in 1788 from specimens collected in the Virginia colonies, which gave it the scientific name virginianus. Early naturalists such as John James Audubon painted it as the fiercest owl of the continent.",
+      "For much of the twentieth century it was widely shot and trapped as a threat to poultry and game birds. Owls and other birds of prey gained federal protection in the US in 1972, when the Migratory Bird Treaty was extended.",
+      "Great horned owls have adapted well to farms, parks and suburbs. Their main human-caused threats today are vehicle collisions, power lines and secondary poisoning from rodenticides.",
+      "In 1977 the great horned owl was chosen as the provincial bird of Alberta, Canada.",
+      "Researchers have used owl pellets, the bundles of bone and fur these owls cough up, to study local small-mammal populations for more than a century. Great horned owl pellets are still dissected in classrooms across North America to teach food webs."
+    ],
+    symbolism: [
+      "Owls often stand for wisdom, from Athena's owl in ancient Greece to the owls on the crests of many schools and libraries.",
+      "In some Indigenous and folk traditions of the Americas, an owl's call warns of death, illness or change, and owls are treated with caution.",
+      "Authors use the owl for night, secrets, watchfulness and hidden knowledge. The great horned owl's fierce yellow eyes and tufts make it a common image of the wise but dangerous elder of the forest.",
+      "Because it hunts other owls and even hawks, birders call it the 'tiger of the air'. As Alberta's provincial bird it represents resilience in a harsh climate, since it stays through the northern winter and nests while snow still covers the ground."
+    ] },
+
+  { id: "bengal-tiger", name: "Bengal Tiger", sci: "Panthera tigris tigris", sub: "Bengal population of the mainland tiger", cat: "Mammal",
+    facts: { Diet: "Carnivore: deer, wild boar, water buffalo", Size: "2.7–3.1 m total (males), 180–260 kg", Lifespan: "10–15 years wild", Range: "India, Bangladesh, Nepal, Bhutan", Status: "Endangered" },
+    biology: [
+      "Tigers are the largest wild cats. Each has a unique stripe pattern, and the stripes continue on the skin under the fur. White tigers are Bengal tigers carrying a rare recessive gene, not a separate species.",
+      "They are solitary ambush hunters. A tiger stalks close under cover, then rushes and seizes prey at the throat or neck. Most attempts fail, so a tiger may hunt for days before a kill, then eat more than 30 kg in one sitting.",
+      "A male's territory overlaps those of several females. Tigers mark their ranges with scent sprays, scrapes and claw marks, and their roars can carry for kilometers.",
+      "Females give birth to two to four cubs after about 100 days and raise them alone. Cubs stay with their mother for around two years, learning to hunt before setting out to find their own territory.",
+      "Unlike most cats they swim well. The Sundarbans population moves through mangrove channels between islands and copes with brackish water."
+    ],
+    history: [
+      "Tigers appear on seals from the Indus Valley civilization more than 4,000 years ago.",
+      "Royal and colonial hunting, known as shikar, killed tens of thousands of tigers. King George V's party shot 39 tigers during a hunt in Nepal in 1911. Combined with habitat loss, this cut India's tigers from tens of thousands to under 2,000 by the 1970s.",
+      "India banned tiger hunting in 1972 and launched Project Tiger in 1973 to create protected reserves. Setbacks followed: by 2005 poachers had wiped out all tigers in Sariska Tiger Reserve, and tigers were moved back there in 2008.",
+      "Better protection and monitoring with camera traps have helped numbers recover. India's 2022 count estimated about 3,700 tigers, around three-quarters of the world's wild population, and Nepal has also more than doubled its tiger population since 2010."
+    ],
+    symbolism: [
+      "The Bengal tiger is the national animal of India and Bangladesh. In Hindu art the goddess Durga rides a tiger into battle, a sign of power under control.",
+      "In the Sundarbans, honey collectors and fishermen pray to the forest goddess Bonbibi for protection from Dakshin Rai, a demon king who takes the form of a tiger.",
+      "Tipu Sultan, the eighteenth-century ruler of Mysore, was called the 'Tiger of Mysore' and used tiger stripes throughout his court. His mechanical 'Tipu's Tiger', showing a tiger mauling a European soldier, is now in London's Victoria and Albert Museum.",
+      "In literature the tiger stands for beauty and terror together, from William Blake's poem The Tyger to Kipling's Shere Khan and Richard Parker in Life of Pi. It also stands for the Chinese zodiac year of the Tiger, and for courage, royalty and raw power."
+    ] }
+];
+
+/* Licensed reference photos, published next to the page as photos/<id>.jpg. Empty until photos are supplied. */
+const PHOTOS = {};
+
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const icon = (id, cls = "ico") => `<svg class="${cls}"><use href="#i-${id}"/></svg>`;
+
+  /* ---------- per-browser storage (best effort) ---------- */
+  const KEY = "wildlens.v2";
+  const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
+  const persisted = load();
+  const state = {
+    saved: persisted.saved || [],
+    recent: persisted.recent || [],          // [{id, at}]
+    custom: persisted.custom || {},          // id -> generated profile
+    photos: persisted.photos || {},          // id -> small data URL of the viewer's photo
+    reports: persisted.reports || [],        // rescue reports, newest first
+    scanCount: persisted.scanCount || 0,
+    settings: Object.assign({ theme: "auto", history: true, motion: false, updates: true, email: false, lang: "English" }, persisted.settings),
+    user: persisted.user || null,
+    scans: {},                               // id -> {confidence} (this session only)
+  };
+  const save = () => {
+    const data = { saved: state.saved, recent: state.recent, custom: state.custom, photos: state.photos, reports: state.reports, scanCount: state.scanCount, settings: state.settings, user: state.user };
+    try { localStorage.setItem(KEY, JSON.stringify(data)); return true; }
+    catch {
+      // Storage full: drop report photos from older reports, then retry once.
+      state.reports.slice(5).forEach((r) => (r.thumb = null));
+      try { localStorage.setItem(KEY, JSON.stringify(data)); return true; } catch { return false; }
+    }
+  };
+
+  const byId = (id) => ANIMALS.find((a) => a.id === id) || state.custom[id];
+  const allAnimals = () => [...ANIMALS, ...Object.values(state.custom)];
+  const statusClass = (s = "") => {
+    const t = s.toLowerCase();
+    if (t.includes("critically")) return "st-cr";
+    if (t.includes("endangered")) return "st-en";
+    if (t.includes("vulnerable")) return "st-vu";
+    if (t.includes("near")) return "st-nt";
+    if (t.includes("least")) return "st-lc";
+    return "st-xx";
+  };
+  const stock = (id) => (typeof PHOTOS !== "undefined" && PHOTOS[id]) || null;
+  const picHTML = (a) => state.photos[a.id] ? `<img src="${state.photos[a.id]}" alt="Your photo of ${esc(a.name)}">`
+    : stock(a.id) ? `<img src="${stock(a.id).src}" alt="Photo of ${esc(a.name)}" loading="lazy">` : ART.get(a.id, a.name);
+  const creditFor = (id) => state.photos[id] ? "Your photo" : stock(id) ? stock(id).credit : "Illustration";
+  const words = (arr) => (arr || []).join(" ").split(/\s+/).filter(Boolean).length;
+  const readMins = (arr) => Math.max(1, Math.round(words(arr) / 220));
+
+  /* ---------- toast ---------- */
+  let toastT;
+  const toast = (t) => { const el = $("#toast"); el.textContent = t; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (el.hidden = true), 2600); };
+
+  /* ---------- routing ---------- */
+  let current = "home", prevView = "home";
+  const navFor = { lore: "guide" };
+  function go(view, arg) {
+    if (view === "lore" && current !== "lore") prevView = current;
+    $$(".view").forEach((v) => (v.hidden = v.id !== "v-" + view));
+    const active = navFor[view] || view;
+    $$(".nav button, .tabbar button").forEach((b) => b.setAttribute("aria-current", b.dataset.go === active ? "page" : "false"));
+    current = view;
+    ({ home: renderHome, guide: renderGuide, lore: () => renderLore(arg), recent: renderRecent, saved: renderSaved, rescue: renderRescue, settings: renderSettings,
+       login: () => ($("#loginArt").innerHTML = ART.get("great-horned-owl", "Great Horned Owl") + `<p class="quote">Every animal has a story. Start with a photo.</p>`) }[view] || (() => {}))();
+    window.scrollTo({ top: 0 });
+  }
+  document.addEventListener("click", (e) => {
+    const g = e.target.closest("[data-go]"); if (g) { e.preventDefault(); go(g.dataset.go); return; }
+    const o = e.target.closest("[data-open]"); if (o) { openAnimal(o.dataset.open); return; }
+    const a = e.target.closest("[data-act='identify']"); if (a) { go("home"); $("#fileIn").click(); }
+  });
+  function openAnimal(id) {
+    if (!byId(id)) return;
+    if (state.settings.history) { state.recent = [{ id, at: Date.now() }, ...state.recent.filter((r) => r.id !== id)].slice(0, 60); save(); }
+    go("lore", id);
+  }
+  function renderCounts() {
+    const set = (id, n) => ($("#" + id).textContent = n ? n : "");
+    set("cGuide", allAnimals().length); set("cRecent", state.recent.length); set("cSaved", state.saved.length); set("cReports", state.reports.length);
+  }
+
+  /* ---------- account (demo) ---------- */
+  function renderAcct() {
+    if (state.user) {
+      const n = state.user.split("@")[0];
+      $("#sideAcct").innerHTML = `<div class="acct"><span class="avatar">${esc(n[0].toUpperCase())}</span><div class="who"><b>${esc(n)}</b><button class="linkbtn" id="logout" style="font-size:13px">Log out</button></div></div>`;
+      $("#topAcct").innerHTML = `<span class="avatar" title="${esc(state.user)}">${esc(n[0].toUpperCase())}</span>`;
+      $("#logout").onclick = () => { state.user = null; save(); renderAcct(); renderHome(); toast("Logged out"); };
+    } else {
+      $("#sideAcct").innerHTML = `<button class="btn block" data-go="login">Log in</button>`;
+      $("#topAcct").innerHTML = `<button class="btn" data-go="login">Log in</button>`;
+    }
+  }
+  $("#loginForm").addEventListener("submit", (e) => { e.preventDefault(); state.user = $("#loginEmail").value.trim() || "explorer@wildlens.demo"; save(); renderAcct(); toast("Logged in (demo)"); go("home"); });
+  $("#googleBtn").onclick = () => { state.user = "google.user@wildlens.demo"; save(); renderAcct(); toast("Logged in (demo)"); go("home"); };
+
+  /* ---------- shared pieces ---------- */
+  const tile = (a, foot) => `<button class="tile" data-open="${a.id}">
+      <div class="pic">${picHTML(a)}</div>
+      <div class="over"><span class="pill ${statusClass(a.facts?.Status)}">${esc(a.facts?.Status || "Status unknown")}</span></div>
+      ${state.saved.includes(a.id) ? `<span class="heart" title="Saved">${icon("heart")}</span>` : ""}
+      <div class="body"><b>${esc(a.name)}</b><span class="sci">${esc(a.sci)}</span>
+        <div class="foot"><span>${esc(a.cat || "Animal")}${a.generated ? " · New" : ""}</span><span>${foot || readMins([...(a.biology || []), ...(a.history || []), ...(a.symbolism || [])]) + " min read"}</span></div></div></button>`;
+  const row = (a, meta) => `<button class="li" data-open="${a.id}"><span class="th">${picHTML(a)}</span><span><b>${esc(a.name)}</b><span class="meta">${meta}</span></span><span class="pill ${statusClass(a.facts?.Status)}">${esc(a.facts?.Status || "Unknown")}</span></button>`;
+  const ago = (t) => { const m = Math.round((Date.now() - t) / 60000); if (m < 1) return "just now"; if (m < 60) return m + " min ago"; const h = Math.round(m / 60); if (h < 24) return h + " h ago"; const d = Math.round(h / 24); return d === 1 ? "yesterday" : d + " days ago"; };
+  const fmtDate = (t, opts) => { try { return new Date(t).toLocaleString(undefined, opts); } catch { return new Date(t).toISOString(); } };
+  const empty = (ic, h, p, btn) => `<div class="empty">${icon(ic)}<h3>${h}</h3><p>${p}</p>${btn || ""}</div>`;
+
+  /* ---------- home ---------- */
+  function renderHome() {
+    const hr = new Date().getHours();
+    const part = hr < 5 ? "Good night" : hr < 12 ? "Good morning" : hr < 18 ? "Good afternoon" : "Good evening";
+    $("#greet").textContent = `${part}${state.user ? ", " + state.user.split("@")[0] : ""} · ${fmtDate(Date.now(), { weekday: "long", day: "numeric", month: "long" })}`;
+    const sent = state.reports.filter((r) => r.status === "sent").length;
+    const tiles = [
+      ["scan", "Identified", state.scanCount, "photos scanned"],
+      ["heart", "Saved", state.saved.length, "in your collection"],
+      ["life", "Rescue reports", state.reports.length, state.reports.length ? `${sent} sent · ${state.reports.length - sent} not sent` : "none yet", "alert"],
+      ["book", "Field guide", allAnimals().length, `${Object.keys(state.custom).length} added by you`],
+    ];
+    $("#stats").innerHTML = tiles.map(([ic, k, v, d, cls]) => `<div class="card stat ${cls || ""}"><span class="k">${icon(ic)}${k}</span><span class="v">${v}</span><span class="d">${d}</span></div>`).join("");
+    const rec = state.recent.map((r) => ({ r, a: byId(r.id) })).filter((x) => x.a).slice(0, 5);
+    $("#homeRecent").innerHTML = rec.length ? `<div class="list">${rec.map((x) => row(x.a, `<span class="sci">${esc(x.a.sci)}</span> · ${ago(x.r.at)}`)).join("")}</div>`
+      : `<div class="card-pad" style="padding-top:6px">${empty("clock", "Nothing here yet", "Open a species from the field guide or identify a photo to start your research trail.", `<button class="btn primary" data-go="guide">Open the field guide</button>`)}</div>`;
+    // status mix
+    const groups = [["st-lc", "Least Concern", "c-lc"], ["st-nt", "Near Threatened", "c-nt"], ["st-vu", "Vulnerable", "c-vu"], ["st-en", "Endangered", "c-en"], ["st-xx", "Other / unknown", "c-xx"]];
+    const all = allAnimals(); const counts = groups.map(([k]) => all.filter((a) => { const c = statusClass(a.facts?.Status); return k === "st-en" ? c === "st-en" || c === "st-cr" : c === k; }).length);
+    $("#statusMix").innerHTML = `<div class="statusbar" role="img" aria-label="${groups.map((g, i) => `${g[1]}: ${counts[i]}`).join(", ")}">${groups.map((g, i) => counts[i] ? `<i class="${g[2]}" style="flex:${counts[i]}" title="${g[1]}: ${counts[i]}"></i>` : "").join("")}</div>
+      <div class="legend">${groups.map((g, i) => counts[i] ? `<div><span class="sw ${g[2]}"></span>${g[1]}<span class="n">${counts[i]}</span></div>` : "").join("")}</div>`;
+    const day = Math.floor(Date.now() / 864e5); const f = ANIMALS[day % ANIMALS.length];
+    $("#featured").innerHTML = `<button class="feature" data-open="${f.id}"><span class="th">${picHTML(f)}</span><span><span class="eyebrow">Species of the day</span><b style="display:block;font-size:18px;margin-top:2px">${esc(f.name)}</b><span class="hint">${esc(f.biology[0].split(". ")[0])}.</span></span></button>`;
+    renderCounts();
+  }
+
+  /* ---------- guide ---------- */
+  let guideCat = "All";
+  function renderGuide() {
+    const all = allAnimals();
+    const cats = ["All", ...new Set(all.map((a) => a.cat || "Animal"))];
+    $("#guideCats").innerHTML = cats.map((c) => `<button class="chip" aria-pressed="${c === guideCat}" data-c="${esc(c)}">${esc(c)}</button>`).join("");
+    $$("#guideCats .chip").forEach((b) => (b.onclick = () => { guideCat = b.dataset.c; renderGuide(); }));
+    const q = $("#guideSearch").value.trim().toLowerCase(), st = $("#guideStatus").value;
+    const shown = all.filter((a) => (guideCat === "All" || (a.cat || "Animal") === guideCat) && (!st || statusClass(a.facts?.Status) === st || (st === "st-en" && statusClass(a.facts?.Status) === "st-cr")) && (!q || (a.name + " " + a.sci).toLowerCase().includes(q)));
+    $("#guideGrid").innerHTML = shown.length ? `<div class="grid">${shown.map((a) => tile(a)).join("")}</div>` : empty("search", "No matches", "Try another name, or clear the filters.");
+  }
+  $("#guideSearch").addEventListener("input", renderGuide);
+  $("#guideStatus").addEventListener("change", renderGuide);
+
+  /* ---------- lore ---------- */
+  function renderLore(id) {
+    const a = byId(id); if (!a) return go("home");
+    const scan = state.scans[id], saved = state.saved.includes(id);
+    const tabs = [["biology", "Biology"], ["history", "History"], ["symbolism", "Symbolism"]];
+    const more = allAnimals().filter((x) => x.id !== id).sort((x, y) => ((x.cat === a.cat) ? -1 : 0) - ((y.cat === a.cat) ? -1 : 0)).slice(0, 4);
+    $("#v-lore").innerHTML = `
+      <div class="band"><div class="wrap">
+        <button class="linkbtn" id="backBtn" style="color:var(--canopy-muted);display:inline-flex;gap:6px;align-items:center;margin-bottom:18px">${icon("back")}Back</button>
+        <div class="lore-hero">
+          <div class="pic">${picHTML(a)}<span class="credit">${esc(creditFor(id))}</span></div>
+          <div>
+            <p class="eyebrow">${esc(a.cat || "Animal")}${a.generated ? " · Identified by you" : ""}</p>
+            <h1 style="margin-top:10px">${esc(a.name)}</h1>
+            <p class="sci">${esc(a.sci)}</p>
+            ${a.sub ? `<p class="subsp">Likely sub-species: ${esc(a.sub)}</p>` : ""}
+            <div class="pills"><span class="pill ${statusClass(a.facts?.Status)}">${esc(a.facts?.Status || "Status unknown")}</span><span class="pill plain tag">${readMins([...a.biology || [], ...a.history || [], ...a.symbolism || []])} min read</span></div>
+            ${scan ? `<div class="conf"><div style="display:flex;justify-content:space-between"><span>Match confidence</span><b>${scan.confidence}%</b></div><div class="meter"><i style="width:${Math.max(4, Math.min(100, scan.confidence))}%"></i></div></div>` : ""}
+            <div class="btns">
+              <button class="btn ${saved ? "saved" : ""}" id="saveBtn">${icon("heart")}${saved ? "Saved" : "Save animal"}</button>
+              <button class="btn ember" id="rescueThis">${icon("life")}Report this animal in danger</button>
+            </div>
+          </div>
+        </div>
+      </div></div>
+      <div class="wrap stack">
+        <dl class="card facts" style="margin:0">${Object.entries(a.facts || {}).filter(([k]) => k !== "Status").map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
+        <div class="reader">
+          <article>
+            <div class="tablist" role="tablist">${tabs.map(([k, l], i) => `<button role="tab" data-tab="${k}" aria-selected="${i === 0}">${l}<small>${readMins(a[k])} min</small></button>`).join("")}</div>
+            <div class="prose" id="prose" role="tabpanel"></div>
+            <p class="note">${a.generated ? "Written by Claude from your photo. Check key facts against a field guide before citing." : "Draft text for the demo. Needs subject-matter review before real use."}</p>
+          </article>
+          <aside><div class="card card-pad aside-card"><h3>More in your guide</h3><div>${more.map((m) => `<button class="li" data-open="${m.id}"><span class="th">${picHTML(m)}</span><span><b>${esc(m.name)}</b><span class="meta">${esc(m.cat || "")}</span></span></button>`).join("")}</div></div></aside>
+        </div>
+      </div>`;
+    const showTab = (t) => {
+      $$("#v-lore [role=tab]").forEach((b) => b.setAttribute("aria-selected", b.dataset.tab === t));
+      $("#prose").innerHTML = (a[t] || []).map((p) => `<p>${esc(p)}</p>`).join("") || `<p>No notes yet.</p>`;
+    };
+    $$("#v-lore [role=tab]").forEach((b) => (b.onclick = () => showTab(b.dataset.tab)));
+    showTab("biology");
+    $("#backBtn").onclick = () => go(prevView || "home");
+    $("#saveBtn").onclick = () => {
+      if (state.saved.includes(id)) { state.saved = state.saved.filter((x) => x !== id); toast("Removed from saved"); }
+      else { state.saved = [id, ...state.saved]; toast("Saved to your collection"); }
+      save(); renderCounts(); renderLore(id);
+    };
+    $("#rescueThis").onclick = () => { draft.species = a.name; go("rescue"); };
+  }
+
+  /* ---------- recent ---------- */
+  let recentFilter = "All";
+  function renderRecent() {
+    const items = state.recent.map((r) => ({ r, a: byId(r.id) })).filter((x) => x.a);
+    const cats = ["All", ...new Set(items.map((x) => x.a.cat || "Animal"))];
+    if (!cats.includes(recentFilter)) recentFilter = "All";
+    $("#recentFilters").innerHTML = cats.map((c) => `<button class="chip" aria-pressed="${c === recentFilter}" data-f="${esc(c)}">${esc(c)}</button>`).join("");
+    $$("#recentFilters .chip").forEach((b) => (b.onclick = () => { recentFilter = b.dataset.f; renderRecent(); }));
+    const q = $("#recentSearch").value.trim().toLowerCase();
+    const shown = items.filter((x) => (recentFilter === "All" || (x.a.cat || "Animal") === recentFilter) && (!q || (x.a.name + " " + x.a.sci).toLowerCase().includes(q)));
+    $("#clearRecent").hidden = !items.length;
+    if (!items.length) { $("#recentList").innerHTML = empty("clock", "No research yet", state.settings.history ? "Animals you identify or open will show up here." : "Research history is turned off in Settings.", `<button class="btn primary" data-act="identify">Identify an animal</button>`); return; }
+    if (!shown.length) { $("#recentList").innerHTML = empty("search", "Nothing matches", "Try another search or filter."); return; }
+    const label = (t) => { const d = new Date(t), n = new Date(); const y = new Date(n); y.setDate(n.getDate() - 1);
+      return d.toDateString() === n.toDateString() ? "Today" : d.toDateString() === y.toDateString() ? "Yesterday" : fmtDate(t, { weekday: "long", day: "numeric", month: "long" }); };
+    const groups = []; shown.forEach((x) => { const l = label(x.r.at); const g = groups.find((g) => g.l === l); g ? g.items.push(x) : groups.push({ l, items: [x] }); });
+    $("#recentList").innerHTML = groups.map((g) => `<div class="day"><h3>${esc(g.l)}</h3><div class="card list">${g.items.map((x) => row(x.a, `<span class="sci">${esc(x.a.sci)}</span> · ${fmtDate(x.r.at, { hour: "2-digit", minute: "2-digit" })}`)).join("")}</div></div>`).join("");
+  }
+  $("#recentSearch").addEventListener("input", renderRecent);
+  $("#clearRecent").onclick = () => { state.recent = []; save(); renderRecent(); renderCounts(); toast("History cleared"); };
+
+  /* ---------- saved ---------- */
+  function renderSaved() {
+    const items = state.saved.map(byId).filter(Boolean);
+    $("#savedSub").textContent = items.length ? `${items.length} animal${items.length > 1 ? "s" : ""} in your collection.` : "Your personal collection.";
+    $("#savedGrid").innerHTML = items.length ? `<div class="grid">${items.map((a) => tile(a)).join("")}</div>`
+      : empty("heart", "Your collection is empty", "Open any animal and press Save animal to keep it here.", `<button class="btn primary" data-open="snow-leopard">Start with the snow leopard</button>`);
+  }
+
+  /* ---------- settings ---------- */
+  function applySettings() {
+    const r = document.documentElement;
+    if (state.settings.theme === "auto") r.removeAttribute("data-theme"); else r.setAttribute("data-theme", state.settings.theme);
+    r.classList.toggle("reduce-motion", !!state.settings.motion);
+  }
+  function renderSettings() {
+    $$("#themeSeg button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.v === state.settings.theme));
+    $("#setHistory").checked = state.settings.history; $("#setMotion").checked = state.settings.motion;
+    $("#setUpdates").checked = state.settings.updates; $("#setEmail").checked = state.settings.email; $("#setLang").value = state.settings.lang;
+    const cfg = mailCfg();
+    $("#cfgMail").textContent = cfg.ready ? (cfg.provider === "mailto" ? "Email app" : "Connected") : "Not set up";
+    $("#cfgMail").className = "kv " + (cfg.ready ? "good" : "warn");
+    $("#cfgMailHint").textContent = cfg.ready ? "Reports are delivered when you press Send." : "Reports are saved on this device and not sent yet.";
+    $("#cfgTo").textContent = cfg.to.length ? cfg.to.join(", ") : "None yet";
+    $("#wipeConfirm").hidden = true;
+  }
+  $$("#themeSeg button").forEach((b) => (b.onclick = () => { state.settings.theme = b.dataset.v; save(); applySettings(); renderSettings(); }));
+  [["setHistory", "history"], ["setMotion", "motion"], ["setUpdates", "updates"], ["setEmail", "email"]].forEach(([el, k]) =>
+    $("#" + el).addEventListener("change", (e) => { state.settings[k] = e.target.checked; save(); applySettings(); }));
+  $("#setLang").addEventListener("change", (e) => { state.settings.lang = e.target.value; save(); toast("Language saved. Translations are coming later."); });
+  $("#wipeBtn").onclick = () => ($("#wipeConfirm").hidden = false);
+  $("#wipeNo").onclick = () => ($("#wipeConfirm").hidden = true);
+  $("#wipeYes").onclick = () => {
+    try { localStorage.removeItem(KEY); } catch {}
+    Object.assign(state, { saved: [], recent: [], custom: {}, photos: {}, reports: [], scanCount: 0, user: null, scans: {} });
+    state.settings = { theme: "auto", history: true, motion: false, updates: true, email: false, lang: "English" };
+    applySettings(); renderAcct(); renderCounts(); renderSettings(); toast("All data deleted");
+  };
+
+  /* ---------- Claude (identification) ---------- */
+  const samplePromise = (window.claude && typeof window.claude.use === "function") ? window.claude.use("sample").catch(() => null) : Promise.resolve(null);
+  const ERR = {
+    not_granted: "WildLens needs permission to use Claude for identification. Reload the page and allow it when asked.",
+    sampling_disabled: "Claude isn't available on this account, so photos can't be identified here. You can still browse the field guide.",
+    capability_disabled: "Identification isn't available in this view. Open the page on claude.ai to scan photos.",
+    not_declared: "Identification isn't available in this view.",
+    images_unavailable: "This view can't send photos to Claude. Try the page in a desktop browser.",
+    image_rejected: "That image couldn't be read. Use a JPEG, PNG, WebP or GIF under 20 MB.",
+    rate_limited: "Too many scans in a short time. Wait a minute, then try again.",
+    session_expired: "Your session expired. Sign in to Claude again, then retry.",
+    refused: "Claude couldn't identify this image. Try a different photo.",
+    invalid_json: "The answer came back incomplete. Try the scan again.",
+    empty_completion: "No answer came back. Try a clearer photo.",
+    unavailable: "Photo identification works when this page is opened on claude.ai. You can still browse the field guide below.",
+  };
+  async function imageSampler() {
+    const sample = await samplePromise; if (!sample) throw { code: "unavailable" };
+    const lim = await sample.limits().catch(() => null); if (!lim?.images) throw { code: "images_unavailable" };
+    return sample;
+  }
+  async function shrink(file, max, q = 0.82) {
+    try {
+      const bmp = await createImageBitmap(file);
+      const s = Math.min(1, max / Math.max(bmp.width, bmp.height));
+      const c = document.createElement("canvas"); c.width = Math.round(bmp.width * s); c.height = Math.round(bmp.height * s);
+      c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+      return c.toDataURL("image/jpeg", q);
+    } catch { return null; }
+  }
+  const slug = (s) => String(s || "animal").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 48);
+
+  const drop = $("#drop"), dropEmpty = $("#dropEmpty"), msg = $("#scanMsg");
+  let ctl = null, busy = false;
+  const showMsg = (text, kind) => { msg.hidden = !text; msg.className = "msg" + (kind ? " " + kind : ""); msg.textContent = text || ""; };
+  const resetDrop = () => { $$(".preview,.reticle,.status", drop).forEach((n) => n.remove()); dropEmpty.hidden = false; };
+
+  async function identify(file) {
+    if (busy || !file) return;
+    if (!/^image\//.test(file.type)) { showMsg("That file isn't an image. Choose a photo.", "err"); return; }
+    busy = true; showMsg("");
+    const url = URL.createObjectURL(file);
+    resetDrop(); dropEmpty.hidden = true;
+    drop.insertAdjacentHTML("beforeend", `<img class="preview" alt="Your photo" src="${url}"><div class="reticle"><i></i><i></i><i></i><i></i></div><div class="status"><span style="display:flex;gap:8px;align-items:center"><span class="spin"></span>Identifying…</span><button class="linkbtn" id="stopBtn" type="button">Stop</button></div>`);
+    ctl = new AbortController();
+    $("#stopBtn").onclick = (e) => { e.stopPropagation(); ctl.abort(); };
+    try {
+      const sample = await imageSampler();
+      const ids = ANIMALS.map((a) => `${a.id} (${a.name})`).join(", ");
+      const prompt = `You are the identification engine of WildLens, a field-guide app for biology students, veterinarians and authors.
+Look at the attached photo and identify the animal in it.
+
+Known profile ids: ${ids}.
+
+Reply with ONLY one JSON object, no other text:
+{"isAnimal": boolean, "reason": string (only if isAnimal is false: one short sentence on what the photo shows),
+ "matchId": one of the known ids above if the animal is that species, else null,
+ "name": common name, "sci": scientific name, "sub": likely sub-species or population ("" if none can be told),
+ "confidence": integer 0-100, "cat": one of "Mammal","Bird","Reptile","Amphibian","Fish","Insect","Other",
+ "facts": {"Diet": string, "Size": string, "Lifespan": string, "Range": string, "Status": IUCN status in words},
+ "biology": [4-5 paragraphs], "history": [4-5 paragraphs], "symbolism": [4-5 paragraphs]}
+If matchId is not null, return empty arrays for biology, history and symbolism and an empty facts object.
+Each paragraph is 3-4 plain sentences of accurate, specific information (anatomy, behavior, diet, reproduction; key dates and people; myths, national emblems, literature). If unsure of the exact species, name the most likely one and lower the confidence.`;
+      const r = await sample.json(prompt, { images: [file], signal: ctl.signal, modelTier: "default" });
+      if (!r || typeof r !== "object") throw { code: "invalid_json" };
+      if (r.isAnimal === false) { resetDrop(); showMsg(`No animal found. ${r.reason || "Try a photo where the animal is clearly visible."}`, "err"); return; }
+      let id = r.matchId && ANIMALS.some((a) => a.id === r.matchId) ? r.matchId : null;
+      if (!id) {
+        id = "x-" + slug(r.sci || r.name);
+        const arr = (v) => (Array.isArray(v) ? v.map(String).filter(Boolean).slice(0, 6) : []);
+        const f = r.facts && typeof r.facts === "object" ? r.facts : {};
+        state.custom[id] = { id, generated: true, name: String(r.name || "Unknown animal"), sci: String(r.sci || ""), sub: String(r.sub || ""), cat: String(r.cat || "Other"),
+          facts: Object.fromEntries(["Diet", "Size", "Lifespan", "Range", "Status"].filter((k) => f[k]).map((k) => [k, String(f[k])])),
+          biology: arr(r.biology), history: arr(r.history), symbolism: arr(r.symbolism) };
+      }
+      const t = await shrink(file, 640); if (t) state.photos[id] = t;
+      state.scans[id] = { confidence: Math.round(Number(r.confidence) || 0) };
+      state.scanCount++;
+      save(); resetDrop(); openAnimal(id);
+    } catch (e) {
+      resetDrop();
+      if (e?.code !== "cancelled") showMsg(ERR[e?.code] || "Something went wrong while identifying. Try again in a moment.", "err");
+    } finally { busy = false; URL.revokeObjectURL(url); }
+  }
+  ["fileIn", "camIn"].forEach((i) => $("#" + i).addEventListener("change", (e) => { identify(e.target.files[0]); e.target.value = ""; }));
+  drop.addEventListener("click", () => { if (!busy) $("#fileIn").click(); });
+  drop.addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && !busy) { e.preventDefault(); $("#fileIn").click(); } });
+  ["dragenter", "dragover"].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add("over"); }));
+  ["dragleave", "drop"].forEach((t) => drop.addEventListener(t, () => drop.classList.remove("over")));
+  drop.addEventListener("drop", (e) => { e.preventDefault(); identify(e.dataTransfer.files[0]); });
+
+  /* ================= RESCUE ================= */
+  const SITUATIONS = ["Injured", "Trapped or entangled", "Orphaned or alone", "Sick or weak", "On a road", "Oiled or polluted", "Attacked by a pet", "Other"];
+  const blankDraft = () => ({ photo: null, species: "", situations: [], urgency: "", comment: "", name: "", phone: "", place: "", loc: null, locState: "idle", locError: "" });
+  let draft = blankDraft();
+  let sending = false;
+
+  function mailCfg() {
+    const c = typeof RESCUE_CONFIG === "object" && RESCUE_CONFIG ? RESCUE_CONFIG : {};
+    const to = (Array.isArray(c.to) ? c.to : [c.to]).filter((x) => typeof x === "string" && x.includes("@"));
+    const provider = ["mailto", "endpoint"].includes(c.provider) ? c.provider : "none";
+    const ready = provider === "mailto" ? to.length > 0 : provider === "endpoint" ? !!c.endpoint : false;
+    return { provider, to, ready, endpoint: c.endpoint || "", prefix: c.subjectPrefix || "[WildLens Rescue]", authority: c.authorityName || "local wildlife authorities" };
+  }
+
+  function renderRescue() {
+    const d = draft;
+    // 1. photo
+    $("#rsPhotoBox").innerHTML = d.photo
+      ? `<div class="rs-photo"><img src="${d.photo}" alt="Photo of the animal"><div class="x"><button class="btn" type="button" id="rsRemove">Remove</button></div></div>`
+      : `<div class="drop photo-drop" id="rsDrop" role="button" tabindex="0" aria-label="Add a photo of the animal"><div class="drop-empty"><span class="ring">${icon("camera")}</span><h3>Add a photo</h3><p>Take one now, choose from your gallery, drop or paste it here.</p></div></div>`;
+    if (d.photo) $("#rsRemove").onclick = () => { draft.photo = null; renderRescue(); };
+    else {
+      const rd = $("#rsDrop");
+      rd.onclick = () => $("#rsCam").click();
+      rd.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("#rsCam").click(); } };
+      ["dragenter", "dragover"].forEach((t) => rd.addEventListener(t, (e) => { e.preventDefault(); rd.classList.add("over"); }));
+      rd.addEventListener("dragleave", () => rd.classList.remove("over"));
+      rd.addEventListener("drop", (e) => { e.preventDefault(); setRescuePhoto(e.dataTransfer.files[0]); });
+    }
+    $("#st1").classList.toggle("done", !!d.photo);
+    // 2. condition
+    $("#rsSpecies").value = d.species;
+    $("#rsSituations").innerHTML = SITUATIONS.map((s) => `<button type="button" class="chip" aria-pressed="${d.situations.includes(s)}" data-s="${esc(s)}">${esc(s)}</button>`).join("");
+    $$("#rsSituations .chip").forEach((b) => (b.onclick = () => { const s = b.dataset.s; draft.situations = draft.situations.includes(s) ? draft.situations.filter((x) => x !== s) : [...draft.situations, s]; b.setAttribute("aria-pressed", draft.situations.includes(s)); renderSummary(); }));
+    $$("#rsUrgency button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.v === d.urgency));
+    $("#rsComment").value = d.comment; $("#rsName").value = d.name; $("#rsPhone").value = d.phone; $("#rsPlace").value = d.place;
+    $("#rsCount").textContent = `${d.comment.length} / 1000`;
+    $("#st2").classList.toggle("done", condOk());
+    // 3. location
+    renderLoc();
+    renderSummary();
+    renderReports();
+    samplePromise.then(async (s) => { const lim = s ? await s.limits().catch(() => null) : null; $("#rsIdentify").hidden = !(lim && lim.images && draft.photoFile); });
+  }
+  const condOk = () => draft.comment.trim().length >= 10 && !!draft.urgency;
+  const locOk = () => !!draft.loc || draft.place.trim().length >= 4;
+
+  function renderLoc() {
+    const d = draft, box = $("#rsLocBox");
+    if (d.loc) {
+      const { lat, lon, acc, at } = d.loc;
+      box.innerHTML = `<div class="loc-card"><span class="pin">${icon("pin")}</span><div style="min-width:0"><b class="mono">${lat.toFixed(5)}, ${lon.toFixed(5)}</b>
+        <span class="hint">Accuracy about ±${Math.round(acc)} m · captured ${fmtDate(at, { hour: "2-digit", minute: "2-digit" })}</span>
+        <div style="display:flex;gap:14px;margin-top:6px;flex-wrap:wrap"><a href="https://www.google.com/maps?q=${lat},${lon}" target="_blank" rel="noopener">Open in Maps</a><button type="button" class="linkbtn" id="rsLocAgain">Update location</button><button type="button" class="linkbtn" id="rsLocClear" style="color:var(--muted)">Remove</button></div></div></div>`;
+      $("#rsLocAgain").onclick = getLocation; $("#rsLocClear").onclick = () => { draft.loc = null; draft.locState = "idle"; renderLoc(); renderSummary(); };
+    } else if (d.locState === "busy") {
+      box.innerHTML = `<div class="loc-card"><span class="pin">${icon("pin")}</span><div><b>Finding your location…</b><span class="hint">Allow location access if your browser asks.</span></div></div>`;
+    } else {
+      box.innerHTML = `${d.locState === "error" ? `<div class="msg err" style="margin-bottom:10px">${esc(d.locError)}</div>` : ""}
+        <button type="button" class="btn primary lg block" id="rsLocBtn">${icon("pin")}Use my current location</button>`;
+      $("#rsLocBtn").onclick = getLocation;
+    }
+    $("#st3").classList.toggle("done", locOk());
+  }
+
+  function getLocation() {
+    if (!("geolocation" in navigator)) { draft.locState = "error"; draft.locError = "This browser can't share its location. Describe the place below instead."; renderLoc(); return; }
+    draft.locState = "busy"; renderLoc();
+    navigator.geolocation.getCurrentPosition(
+      (p) => { draft.loc = { lat: p.coords.latitude, lon: p.coords.longitude, acc: Math.max(1, p.coords.accuracy || 1), at: Date.now() }; draft.locState = "ok"; renderLoc(); renderSummary(); toast("Location added"); },
+      (err) => {
+        draft.locState = "error";
+        draft.locError = err && err.code === 1
+          ? "Location access is blocked. Allow it in your browser settings, or describe the place below. (Inside claude.ai previews, location is always blocked.)"
+          : err && err.code === 3 ? "Finding your location took too long. Try again outdoors, or describe the place below."
+          : "Your location couldn't be found. Try again, or describe the place below.";
+        renderLoc(); renderSummary();
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+    );
+  }
+
+  function renderSummary() {
+    const cfg = mailCfg(), d = draft;
+    const checks = [[!!d.photo, "Photo of the animal"], [d.comment.trim().length >= 10, "Description of its state"], [!!d.urgency, "Urgency level"], [locOk(), "Location or directions"]];
+    const ready = checks.every((c) => c[0]);
+    $("#rsSummary").innerHTML = `
+      <div><p class="eyebrow">Step 4</p><h3 style="margin-top:4px">Review and send</h3></div>
+      <ul class="check">${checks.map(([ok, l]) => `<li class="${ok ? "ok" : ""}"><span class="dot">${ok ? icon("check") : ""}</span>${l}</li>`).join("")}</ul>
+      ${d.urgency ? `<p style="font-size:14px">Urgency: <span class="pill ${d.urgency === "Critical" ? "st-en" : d.urgency === "Urgent" ? "st-vu" : "st-lc"}">${esc(d.urgency)}</span></p>` : ""}
+      <div class="sendto">${icon("mail")} Sends to <b>${cfg.to.length ? esc(cfg.to.join(", ")) : esc(cfg.authority)}</b>${cfg.ready ? "" : `<br><span style="color:var(--warn);font-weight:600">Email isn't set up yet. Your report will be saved on this device.</span>`}</div>
+      <button class="btn ember lg block" id="rsSend" ${ready && !sending ? "" : "disabled"}>${sending ? `<span class="spin"></span>Sending…` : `${icon("send")}Send`}</button>
+      <p class="hint">${ready ? "Check the details, then press Send." : "Complete the items above to send."}</p>`;
+    $("#rsSend").onclick = sendReport;
+    $("#st2").classList.toggle("done", condOk());
+  }
+
+  // inputs
+  const bindText = (id, key, after) => $(id).addEventListener("input", (e) => { draft[key] = e.target.value; after && after(); renderSummary(); });
+  bindText("#rsSpecies", "species"); bindText("#rsName", "name"); bindText("#rsPhone", "phone");
+  bindText("#rsPlace", "place", () => $("#st3").classList.toggle("done", locOk()));
+  $("#rsComment").setAttribute("maxlength", "1000");
+  bindText("#rsComment", "comment", () => ($("#rsCount").textContent = `${draft.comment.length} / 1000`));
+  $$("#rsUrgency button").forEach((b) => (b.onclick = () => { draft.urgency = b.dataset.v; $$("#rsUrgency button").forEach((x) => x.setAttribute("aria-pressed", x === b)); renderSummary(); }));
+  $("#rescueForm").addEventListener("submit", (e) => e.preventDefault());
+
+  async function setRescuePhoto(file) {
+    if (!file || !/^image\//.test(file.type)) { toast("Choose an image file"); return; }
+    const data = await shrink(file, 1280, 0.85);
+    if (!data) { toast("That image couldn't be read"); return; }
+    draft.photo = data; draft.photoFile = file; renderRescue();
+  }
+  ["rsCam", "rsFile"].forEach((i) => $("#" + i).addEventListener("change", (e) => { setRescuePhoto(e.target.files[0]); e.target.value = ""; }));
+
+  $("#rsIdentify").onclick = async () => {
+    const b = $("#rsIdentify"); b.disabled = true; b.innerHTML = `<span class="spin"></span>Identifying`;
+    try {
+      const sample = await imageSampler();
+      const r = await sample.json('Name the animal in this photo. Reply with only JSON: {"name": common name, or "" if no animal is visible}', { images: [draft.photoFile], modelTier: "quick" });
+      if (r && r.name) { draft.species = String(r.name).slice(0, 80); $("#rsSpecies").value = draft.species; toast("Animal identified: " + draft.species); }
+      else toast("No animal recognized in the photo");
+    } catch (e) { toast(ERR[e?.code] ? ERR[e.code].split(".")[0] : "Couldn't identify the animal"); }
+    finally { b.disabled = false; b.innerHTML = `${icon("sparkle")}Identify`; }
+  };
+
+  function composeEmail(r) {
+    const cfg = mailCfg();
+    const where = r.place || (r.loc ? `${r.loc.lat.toFixed(4)}, ${r.loc.lon.toFixed(4)}` : "unknown location");
+    const subject = `${cfg.prefix} ${r.urgency}: ${r.species || "Animal"} needs help near ${where}`.slice(0, 180);
+    const L = [];
+    L.push(`WildLens rescue report ${r.id}`, "");
+    L.push(`Urgency:   ${r.urgency}`);
+    L.push(`Animal:    ${r.species || "Not identified"}`);
+    L.push(`Situation: ${r.situations.length ? r.situations.join(", ") : "Not specified"}`);
+    L.push(`Reported:  ${fmtDate(r.createdAt, { dateStyle: "medium", timeStyle: "short" })}`, "");
+    L.push("CONDITION", r.comment, "");
+    L.push("LOCATION");
+    if (r.loc) { L.push(`Coordinates: ${r.loc.lat.toFixed(5)}, ${r.loc.lon.toFixed(5)} (accuracy about ±${Math.round(r.loc.acc)} m)`); L.push(`Map: https://www.google.com/maps?q=${r.loc.lat.toFixed(6)},${r.loc.lon.toFixed(6)}`); }
+    else L.push("Coordinates: not shared");
+    if (r.place) L.push(`Directions: ${r.place}`);
+    L.push("", "REPORTER", `Name:  ${r.name || "Not given"}`, `Phone: ${r.phone || "Not given"}`, "");
+    L.push(cfg.provider === "mailto" ? "Photo: taken in the WildLens app (email apps can't attach it automatically)." : "Photo: attached.");
+    L.push("", "Sent with WildLens. Please don't reply to the app; contact the reporter directly if details are given.");
+    return { to: cfg.to, subject, body: L.join("\n") };
+  }
+
+  const newId = () => { const d = new Date(); const p = (n) => String(n).padStart(2, "0"); return `WL-${String(d.getFullYear()).slice(2)}${p(d.getMonth() + 1)}${p(d.getDate())}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`; };
+
+  async function sendReport() {
+    if (sending) return;
+    const d = draft;
+    const r = { id: newId(), createdAt: Date.now(), species: d.species.trim(), situations: [...d.situations], urgency: d.urgency, comment: d.comment.trim(), name: d.name.trim(), phone: d.phone.trim(), place: d.place.trim(), loc: d.loc, status: "saved", note: "" };
+    const mail = composeEmail(r);
+    const cfg = mailCfg();
+    sending = true; renderSummary();
+    try {
+      if (cfg.provider === "endpoint" && cfg.ready) {
+        const fd = new FormData();
+        fd.append("_subject", mail.subject); fd.append("to", mail.to.join(",")); fd.append("message", mail.body);
+        fd.append("report_id", r.id); fd.append("urgency", r.urgency); fd.append("species", r.species);
+        if (r.loc) { fd.append("latitude", r.loc.lat); fd.append("longitude", r.loc.lon); fd.append("accuracy_m", Math.round(r.loc.acc)); }
+        const blob = await (await fetch(d.photo)).blob(); fd.append("photo", blob, r.id + ".jpg");
+        const res = await fetch(cfg.endpoint, { method: "POST", body: fd, headers: { Accept: "application/json" } });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        r.status = "sent"; r.note = `Sent to ${cfg.to.join(", ") || cfg.authority}`;
+      } else if (cfg.provider === "mailto" && cfg.ready) {
+        const a = document.createElement("a");
+        a.href = `mailto:${cfg.to.map(encodeURIComponent).join(",")}?subject=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
+        a.target = "_blank"; a.rel = "noopener"; document.body.appendChild(a); a.click(); a.remove();
+        r.status = "draft"; r.note = "Opened in your email app. Check it was sent from there.";
+      } else {
+        r.status = "saved"; r.note = "Email isn't set up yet, so the report was saved on this device and not sent.";
+      }
+    } catch (e) {
+      r.status = "failed"; r.note = "Sending failed (" + (e.message || "network error") + "). The report is saved; try again later.";
+    }
+    r.thumb = await (async () => { try { const img = new Image(); img.src = d.photo; await img.decode(); const c = document.createElement("canvas"); const s = 320 / Math.max(img.width, img.height); c.width = img.width * s; c.height = img.height * s; c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); return c.toDataURL("image/jpeg", 0.75); } catch { return null; } })();
+    r.mail = { subject: mail.subject, body: mail.body, to: mail.to };
+    state.reports = [r, ...state.reports].slice(0, 50);
+    const stored = save();
+    sending = false; draft = blankDraft();
+    renderRescue(); renderCounts(); showResult(r, stored);
+    $("#rsResult").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  const statusPill = (s) => ({ sent: `<span class="pill st-lc">Sent</span>`, draft: `<span class="pill st-vu">In email app</span>`, failed: `<span class="pill st-en">Failed</span>`, saved: `<span class="pill st-xx">Saved · not sent</span>` }[s] || "");
+  function showResult(r, stored = true) {
+    const box = $("#rsResult");
+    const head = { sent: ["check", "Report sent", "ok"], draft: ["mail", "Report opened in your email app", "ok"], failed: ["alert", "Report not sent", "err"], saved: ["check", "Report saved", ""] }[r.status];
+    box.hidden = false;
+    box.innerHTML = `<div class="card-pad" style="display:grid;gap:14px">
+      <div class="sec-head" style="margin:0"><h2 style="display:flex;gap:10px;align-items:center">${icon(head[0])}${head[1]}</h2><span class="mono hint">${esc(r.id)}</span></div>
+      <div class="msg ${head[2]}">${esc(r.note)}${stored ? "" : " This browser's storage is full, so the report may not survive a reload."}</div>
+      <div><p class="eyebrow" style="margin-bottom:6px">Email preview</p>
+        <div class="mail">To: ${esc((r.mail.to || []).join(", ") || "(not set up)")}\nSubject: ${esc(r.mail.subject)}\n\n${esc(r.mail.body)}</div></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" id="rsCopy">${icon("copy")}Copy report text</button><button class="btn" id="rsCloseRes">Close</button></div></div>`;
+    $("#rsCopy").onclick = async () => {
+      const text = `Subject: ${r.mail.subject}\n\n${r.mail.body}`;
+      try { await navigator.clipboard.writeText(text); toast("Report copied"); }
+      catch { const sel = window.getSelection(); const range = document.createRange(); range.selectNodeContents($("#rsResult .mail")); sel.removeAllRanges(); sel.addRange(range); toast("Press Ctrl+C or ⌘C to copy"); }
+    };
+    $("#rsCloseRes").onclick = () => (box.hidden = true);
+  }
+
+  function renderReports() {
+    const list = state.reports;
+    $("#rsReportsHint").textContent = list.length ? `${list.length} report${list.length > 1 ? "s" : ""} on this device` : "";
+    $("#rsReports").innerHTML = list.length ? `<div class="card">${list.map((r) => `<div class="report">
+        <span class="th">${r.thumb ? `<img src="${r.thumb}" alt="">` : ""}</span>
+        <div style="min-width:0"><b>${esc(r.species || "Animal")} · ${esc(r.urgency)}</b><span class="meta">${esc(fmtDate(r.createdAt, { dateStyle: "medium", timeStyle: "short" }))} · ${esc(r.place || (r.loc ? r.loc.lat.toFixed(3) + ", " + r.loc.lon.toFixed(3) : ""))}</span><div style="margin-top:4px">${statusPill(r.status)}</div></div>
+        <button class="btn" data-rep="${esc(r.id)}">View</button></div>`).join("")}</div>`
+      : empty("life", "No reports yet", "Reports you send appear here so you can track them.");
+    $$("[data-rep]").forEach((b) => (b.onclick = () => { const r = state.reports.find((x) => x.id === b.dataset.rep); if (r) { showResult(r); $("#rsResult").scrollIntoView({ behavior: "smooth", block: "start" }); } }));
+  }
+
+  /* ---------- paste anywhere ---------- */
+  document.addEventListener("paste", (e) => {
+    if (e.target.closest && e.target.closest("input,textarea")) return;
+    const f = [...(e.clipboardData?.files || [])].find((x) => x.type.startsWith("image/"));
+    if (!f) return;
+    if (current === "rescue") setRescuePhoto(f); else { if (current !== "home") go("home"); identify(f); }
+  });
+
+  /* ---------- boot ---------- */
+  applySettings(); renderAcct(); go("home");
+  const h = location.hash.slice(1);
+  if (h === "rescue") go("rescue"); else if (h && byId(h)) openAnimal(h);
+})();
+
+</script>

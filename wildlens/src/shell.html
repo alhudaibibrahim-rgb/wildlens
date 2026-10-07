@@ -1,0 +1,620 @@
+<title>WildLens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: field-station dashboard. Fixed sidebar (desktop) / bottom tab bar with a central Rescue button (phone).
+   Each screen opens with a dark "canopy" band (contour-line texture), then light working surfaces. */
+:root{
+  --bg:#F1F4EE; --surface:#FFFFFF; --surface-2:#EBF0E6; --ink:#13221A; --muted:#58695D; --line:#DAE2D4;
+  --forest:#1D5235; --forest-ink:#FFFFFF; --canopy:#0F2A1C; --canopy-ink:#EAF2E4; --canopy-muted:#A9BFA9; --lime:#BCE05C;
+  --ember:#D4491F; --ember-ink:#FFFFFF; --ember-soft:#FBE7DF;
+  --ok:#24784A; --warn:#A8650E; --bad:#B0372A;
+  --shadow:0 1px 2px rgba(16,34,24,.06),0 8px 24px -12px rgba(16,34,24,.18);
+  --display:"Young Serif", Georgia, "Times New Roman", serif;
+  --body:"Instrument Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --r:14px; --r-sm:10px;
+  --contours:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22560%22 height=%22360%22 viewBox=%220 0 560 360%22%3E%3Cg fill=%22none%22 stroke=%22%23BCE05C%22 stroke-width=%221.2%22%3E%3Cpath d=%22M172 120 L173 122 L172 124 L171 126 L169 128 L167 129 L165 131 L163 132 L161 133 L159 134 L157 135 L155 136 L153 136 L151 137 L148 137 L146 137 L144 137 L142 137 L140 137 L138 137 L136 137 L134 137 L131 138 L128 139 L125 139 L122 139 L119 139 L116 138 L114 136 L113 134 L112 132 L112 130 L113 127 L114 125 L116 123 L117 121 L118 120 L119 119 L119 117 L119 116 L118 114 L118 112 L118 111 L118 109 L119 107 L120 105 L122 104 L124 103 L126 102 L128 101 L130 100 L132 99 L135 98 L137 97 L140 97 L143 97 L145 98 L148 99 L150 100 L151 102 L152 104 L153 106 L154 108 L154 109 L155 110 L157 111 L159 112 L161 113 L164 114 L167 115 L169 116 L171 118 L172 120Z%22/%3E%3Cpath d=%22M208 120 L207 124 L204 128 L200 132 L195 135 L190 137 L185 139 L180 141 L176 142 L173 144 L169 146 L167 148 L164 150 L160 152 L157 154 L153 156 L149 157 L144 158 L140 158 L135 159 L131 159 L126 160 L120 160 L115 160 L109 160 L103 159 L98 157 L94 154 L91 151 L89 146 L89 142 L90 137 L93 133 L95 129 L98 126 L99 123 L100 120 L99 117 L98 114 L96 111 L94 107 L92 103 L91 99 L92 95 L93 91 L96 88 L100 85 L105 83 L110 81 L115 80 L120 79 L125 78 L130 78 L135 78 L140 78 L145 79 L149 80 L154 82 L157 85 L160 88 L163 91 L165 93 L167 96 L170 98 L173 99 L178 101 L183 102 L188 103 L194 105 L199 108 L204 112 L207 116 L208 120Z%22/%3E%3Cpath d=%22M240 120 L236 126 L230 132 L222 136 L214 140 L206 143 L198 145 L193 147 L188 150 L185 153 L182 157 L179 162 L176 167 L172 171 L167 176 L162 179 L155 182 L148 184 L140 185 L132 185 L125 184 L117 183 L109 182 L102 181 L94 179 L87 176 L81 172 L76 167 L73 162 L72 155 L72 149 L74 143 L76 137 L78 132 L80 128 L80 124 L78 120 L75 116 L70 111 L66 105 L62 99 L59 92 L58 85 L60 78 L64 73 L70 68 L78 65 L87 63 L95 63 L104 63 L112 63 L120 64 L127 64 L133 64 L140 65 L146 65 L153 66 L159 68 L165 70 L170 72 L175 75 L180 78 L185 80 L191 82 L197 84 L204 87 L212 89 L220 92 L228 96 L235 101 L239 107 L241 113 L240 120Z%22/%3E%3Cpath d=%22M263 120 L256 128 L247 134 L237 139 L227 143 L218 147 L211 150 L206 154 L202 159 L201 165 L199 172 L197 180 L194 189 L188 197 L181 204 L172 209 L162 212 L151 213 L140 212 L129 210 L119 207 L110 204 L101 200 L92 196 L84 192 L77 187 L70 182 L64 176 L60 169 L58 163 L57 156 L57 149 L57 142 L56 137 L55 131 L52 126 L47 120 L41 114 L34 106 L28 98 L24 89 L22 79 L24 70 L29 62 L37 56 L48 52 L60 50 L73 49 L86 50 L97 52 L107 53 L116 54 L124 54 L132 54 L140 52 L148 51 L157 50 L166 49 L175 50 L183 51 L192 53 L201 56 L209 59 L217 63 L226 67 L235 71 L244 76 L252 81 L260 88 L265 95 L268 103 L267 112 L263 120Z%22/%3E%3Cpath d=%22M277 120 L269 128 L260 136 L250 142 L241 147 L233 152 L228 158 L226 164 L225 173 L224 182 L223 193 L221 205 L215 217 L207 227 L196 235 L183 239 L169 241 L154 239 L140 235 L127 229 L116 223 L105 216 L96 210 L87 204 L78 199 L70 194 L62 189 L54 184 L47 178 L41 171 L36 165 L32 157 L28 150 L24 143 L19 136 L14 128 L7 120 L0 111 L-6 101 L-11 90 L-13 79 L-11 68 L-5 58 L4 50 L18 44 L33 41 L50 40 L66 41 L80 43 L93 45 L104 47 L113 46 L122 44 L131 40 L140 35 L151 30 L162 26 L175 23 L188 22 L201 23 L213 26 L225 30 L235 36 L245 42 L254 49 L262 57 L270 65 L276 73 L282 82 L285 91 L285 101 L283 111 L277 120Z%22/%3E%3Cpath d=%22M289 120 L284 129 L277 138 L270 146 L264 153 L260 161 L257 170 L256 180 L256 192 L255 205 L252 219 L247 233 L238 246 L225 256 L210 262 L192 264 L174 262 L156 257 L140 249 L126 239 L114 230 L103 221 L94 214 L84 209 L74 205 L62 202 L50 199 L38 196 L25 191 L14 185 L4 178 L-5 170 L-12 161 L-19 151 L-24 141 L-30 131 L-35 120 L-39 108 L-42 96 L-43 84 L-40 71 L-34 60 L-23 50 L-9 43 L8 38 L26 36 L44 35 L61 37 L76 38 L88 38 L99 37 L108 32 L118 26 L128 18 L140 9 L154 0 L170 -7 L187 -11 L205 -12 L221 -9 L236 -3 L248 5 L259 15 L267 26 L274 37 L279 48 L284 58 L289 69 L292 79 L294 89 L295 100 L293 110 L289 120Z%22/%3E%3Cpath d=%22M448 250 L450 252 L451 254 L451 256 L451 258 L450 260 L448 262 L446 263 L443 264 L440 265 L436 265 L434 264 L431 264 L429 264 L427 264 L425 265 L424 266 L422 267 L420 268 L418 269 L415 270 L413 270 L410 270 L407 270 L405 269 L403 268 L401 267 L399 266 L397 264 L396 263 L394 261 L393 259 L392 257 L392 256 L392 254 L393 252 L394 250 L396 248 L398 247 L399 246 L401 245 L401 244 L402 242 L402 241 L402 239 L401 236 L402 234 L403 232 L404 229 L406 228 L409 227 L411 226 L414 226 L417 227 L420 228 L422 229 L425 231 L427 232 L428 233 L430 234 L432 235 L434 235 L436 236 L437 237 L439 238 L440 240 L441 241 L442 242 L443 244 L444 245 L445 247 L447 248 L448 250Z%22/%3E%3Cpath d=%22M480 250 L481 254 L482 258 L481 262 L479 266 L476 269 L472 272 L467 274 L461 275 L455 276 L449 276 L444 276 L440 276 L437 277 L434 278 L431 281 L428 284 L424 287 L420 291 L415 293 L409 295 L404 296 L398 295 L393 293 L388 291 L385 287 L382 284 L379 280 L377 277 L375 273 L373 270 L372 267 L371 263 L370 260 L370 257 L371 253 L372 250 L374 247 L375 244 L377 241 L378 239 L378 236 L378 232 L378 228 L378 224 L378 219 L380 215 L382 210 L386 207 L391 204 L397 203 L403 204 L409 205 L415 208 L420 211 L424 214 L428 216 L431 218 L435 220 L438 221 L442 221 L447 222 L451 223 L456 224 L460 225 L464 227 L467 230 L470 233 L472 236 L474 239 L476 243 L478 246 L480 250Z%22/%3E%3Cpath d=%22M508 250 L508 256 L506 261 L504 267 L500 272 L495 276 L489 280 L482 282 L475 284 L468 286 L462 287 L456 288 L451 290 L447 293 L443 297 L439 302 L434 308 L427 313 L420 318 L412 322 L403 323 L394 322 L386 320 L379 315 L373 310 L369 303 L367 297 L365 291 L363 286 L361 281 L359 276 L356 272 L353 268 L351 264 L348 259 L347 255 L346 250 L346 245 L347 240 L347 236 L348 231 L349 225 L349 220 L350 214 L351 207 L354 201 L358 195 L363 190 L370 186 L379 184 L388 184 L397 186 L406 190 L413 194 L420 198 L426 202 L431 205 L436 207 L441 207 L447 207 L454 206 L462 205 L471 205 L479 206 L487 208 L494 212 L499 216 L503 221 L506 227 L507 233 L508 239 L508 244 L508 250Z%22/%3E%3Cpath d=%22M527 250 L525 257 L522 263 L519 270 L515 276 L511 281 L505 286 L499 291 L492 295 L485 298 L479 302 L472 306 L467 310 L461 316 L455 322 L449 329 L441 336 L431 343 L420 347 L408 349 L396 349 L385 346 L376 340 L368 332 L363 323 L360 314 L357 305 L356 298 L353 291 L350 286 L346 282 L340 278 L333 273 L326 269 L320 263 L315 257 L311 250 L310 243 L309 236 L310 228 L312 221 L315 214 L318 206 L322 199 L326 192 L332 185 L340 179 L349 174 L359 172 L370 171 L382 172 L393 175 L403 179 L412 183 L420 187 L427 190 L434 191 L441 191 L450 189 L460 187 L471 184 L483 183 L496 183 L508 185 L519 189 L527 194 L533 202 L536 210 L536 219 L535 227 L533 235 L530 243 L527 250Z%22/%3E%3Cpath d=%22M538 250 L535 257 L533 265 L532 272 L531 280 L530 288 L527 296 L522 303 L516 310 L510 316 L503 323 L495 329 L487 336 L478 343 L469 350 L459 357 L447 364 L434 369 L420 371 L406 371 L392 368 L380 361 L370 352 L362 342 L357 331 L354 320 L351 311 L348 304 L343 298 L336 294 L327 290 L316 286 L303 281 L291 276 L281 268 L273 260 L268 250 L266 240 L268 230 L272 221 L278 212 L285 203 L293 196 L301 188 L310 181 L319 175 L329 170 L340 165 L352 163 L364 162 L377 162 L389 164 L400 167 L410 170 L420 171 L429 172 L439 171 L450 168 L462 164 L476 160 L492 157 L509 156 L524 158 L539 162 L550 169 L557 179 L561 190 L560 202 L557 213 L552 224 L547 233 L542 242 L538 250Z%22/%3E%3Cpath d=%22M498 60 L499 62 L500 64 L501 66 L501 68 L500 70 L498 72 L496 74 L493 74 L490 75 L487 75 L484 75 L481 74 L479 74 L477 74 L475 75 L474 75 L472 77 L470 78 L468 79 L465 80 L463 81 L460 81 L457 80 L455 80 L453 78 L451 77 L449 76 L447 74 L446 73 L445 71 L444 69 L443 67 L442 65 L442 64 L443 62 L444 60 L446 58 L447 57 L449 56 L450 55 L451 53 L452 52 L452 51 L452 49 L452 47 L452 44 L453 42 L454 40 L456 38 L458 37 L461 36 L464 36 L467 37 L470 38 L472 39 L475 41 L477 42 L478 43 L480 44 L482 45 L484 46 L485 47 L487 47 L489 48 L490 50 L491 51 L492 52 L493 54 L495 55 L496 57 L497 58 L498 60Z%22/%3E%3Cpath d=%22M529 60 L530 64 L531 68 L530 72 L529 76 L526 79 L522 82 L517 84 L511 86 L506 86 L500 86 L495 86 L491 86 L487 87 L484 88 L481 90 L478 93 L474 97 L470 100 L465 103 L459 105 L453 106 L448 105 L442 104 L438 101 L434 98 L431 94 L429 90 L427 87 L426 83 L424 80 L423 76 L422 73 L421 70 L421 66 L421 63 L421 60 L423 57 L424 54 L426 51 L427 48 L428 45 L428 42 L428 38 L429 34 L429 30 L431 25 L433 21 L437 17 L441 14 L447 13 L453 13 L459 14 L465 17 L470 20 L474 23 L478 26 L481 28 L485 30 L488 31 L492 32 L496 32 L501 33 L505 34 L510 35 L514 37 L518 40 L521 42 L523 46 L525 49 L527 53 L528 56 L529 60Z%22/%3E%3Cpath d=%22M557 60 L556 66 L555 71 L552 76 L549 81 L545 86 L539 90 L533 93 L526 95 L519 97 L513 98 L507 99 L502 101 L497 103 L493 107 L489 111 L484 117 L477 122 L470 127 L462 131 L453 133 L444 133 L435 130 L428 126 L423 121 L419 114 L416 108 L414 101 L413 95 L412 90 L410 86 L408 82 L405 78 L402 74 L399 69 L397 65 L395 60 L395 55 L395 50 L396 45 L397 40 L398 35 L399 30 L400 24 L402 18 L405 12 L409 6 L414 1 L421 -3 L429 -5 L438 -6 L447 -4 L455 -1 L463 3 L470 7 L476 11 L481 15 L486 17 L491 18 L497 18 L504 17 L511 16 L520 16 L529 16 L537 18 L544 21 L550 26 L554 31 L557 37 L558 42 L559 48 L558 54 L557 60Z%22/%3E%3Cpath d=%22M89 320 L89 322 L89 324 L89 326 L88 328 L87 329 L86 331 L85 333 L83 334 L81 335 L78 336 L75 336 L73 336 L70 336 L68 335 L65 335 L64 335 L62 335 L60 336 L58 337 L56 338 L53 339 L50 340 L47 341 L44 341 L41 340 L39 339 L37 337 L36 335 L35 333 L35 331 L35 329 L35 327 L35 325 L35 323 L35 322 L35 320 L36 318 L36 317 L37 315 L37 314 L38 313 L39 311 L41 310 L42 309 L43 307 L43 305 L44 304 L46 302 L47 300 L49 298 L51 296 L54 295 L57 295 L60 296 L63 297 L65 299 L67 300 L69 302 L70 304 L71 306 L72 307 L73 308 L75 309 L77 309 L79 310 L82 311 L84 312 L86 313 L87 315 L89 316 L89 318 L89 320Z%22/%3E%3Cpath d=%22M122 320 L121 324 L118 328 L116 331 L113 334 L110 337 L107 340 L104 343 L101 345 L97 347 L93 349 L88 350 L84 350 L79 351 L75 351 L71 351 L68 352 L64 354 L60 356 L55 358 L50 361 L45 363 L38 364 L32 364 L26 363 L21 361 L17 358 L15 353 L14 349 L14 344 L15 339 L16 335 L16 332 L17 329 L16 326 L16 323 L14 320 L13 317 L12 314 L11 310 L12 307 L12 304 L14 300 L16 297 L18 294 L21 291 L23 288 L26 284 L30 281 L34 278 L38 276 L43 274 L49 273 L55 274 L60 276 L65 278 L69 282 L72 286 L75 289 L78 292 L80 294 L83 296 L87 296 L91 297 L96 297 L102 298 L108 299 L113 302 L118 304 L121 308 L123 312 L123 316 L122 320Z%22/%3E%3Cpath d=%22M152 320 L147 326 L141 331 L136 335 L131 339 L126 343 L123 347 L119 351 L115 354 L111 358 L107 361 L102 364 L96 367 L91 369 L85 371 L79 373 L73 375 L67 378 L60 381 L52 384 L44 387 L35 388 L26 389 L18 387 L10 384 L4 379 L0 373 L-2 366 L-2 359 L-1 352 L0 345 L2 340 L2 336 L1 332 L-2 328 L-6 324 L-10 320 L-15 315 L-19 310 L-21 304 L-22 298 L-20 292 L-18 287 L-14 282 L-9 277 L-3 273 L3 269 L9 266 L15 263 L22 260 L30 258 L37 257 L45 257 L53 258 L60 261 L67 264 L72 268 L77 272 L82 276 L86 279 L91 280 L97 281 L104 281 L113 281 L122 282 L132 283 L141 285 L148 289 L154 295 L157 301 L158 307 L156 314 L152 320Z%22/%3E%3C/g%3E%3C/svg%3E");
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B120E; --surface:#131C16; --surface-2:#19241D; --ink:#E3EBE2; --muted:#97A79A; --line:#24312A;
+  --forest:#82C79A; --forest-ink:#0B1A11; --canopy:#081A10; --canopy-ink:#E6EFE1; --canopy-muted:#94AB97; --lime:#C8EA6E;
+  --ember:#F1754B; --ember-ink:#1C0B05; --ember-soft:#3A1E15;
+  --ok:#7CCF9C; --warn:#E6AA55; --bad:#EE8573;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.6); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B120E; --surface:#131C16; --surface-2:#19241D; --ink:#E3EBE2; --muted:#97A79A; --line:#24312A;
+  --forest:#82C79A; --forest-ink:#0B1A11; --canopy:#081A10; --canopy-ink:#E6EFE1; --canopy-muted:#94AB97; --lime:#C8EA6E;
+  --ember:#F1754B; --ember-ink:#1C0B05; --ember-soft:#3A1E15;
+  --ok:#7CCF9C; --warn:#E6AA55; --bad:#EE8573;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.6); color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--body);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.005em}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--forest);outline-offset:2px;border-radius:6px}
+a{color:var(--forest)}
+.mono{font-family:var(--mono);font-size:.9em;font-variant-numeric:tabular-nums}
+.sci{font-style:italic;color:var(--muted)}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--muted)}
+.hint{font-size:13px;color:var(--muted)}
+.ico{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:10px 18px;cursor:pointer;font-weight:600;font-size:15px;text-decoration:none;color:var(--ink);transition:transform .12s,border-color .12s,background .12s}
+.btn:hover{border-color:var(--forest)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--forest);color:var(--forest-ink);border-color:var(--forest)}
+.btn.ember{background:var(--ember);color:var(--ember-ink);border-color:var(--ember)}
+.btn.primary:hover,.btn.ember:hover{filter:brightness(1.07)}
+.btn.lg{padding:14px 24px;font-size:16px}
+.btn.block{width:100%}
+.btn[disabled]{opacity:.45;cursor:not-allowed;filter:none}
+.btn .ico{width:18px;height:18px}
+.btn{white-space:nowrap}
+@media (max-width:520px){.row-actions .btn{padding:10px 10px;font-size:14px;gap:6px}}
+.linkbtn{background:none;border:0;padding:0;color:var(--forest);cursor:pointer;font-weight:600}
+
+/* ---------- app shell ---------- */
+.app{display:grid;grid-template-columns:252px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:6px;padding:22px 16px;background:var(--surface);border-right:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;background:none;border:0;cursor:pointer;padding:4px 8px 18px;color:var(--ink)}
+.brand svg{width:36px;height:36px;flex:none}
+.brand b{font-family:var(--display);font-weight:400;font-size:25px}
+.nav{display:grid;gap:2px}
+.nav-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:14px 12px 6px}
+.nav button{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;border-radius:10px;padding:10px 12px;cursor:pointer;color:var(--muted);font-weight:500;text-align:left}
+.nav button:hover{background:var(--surface-2);color:var(--ink)}
+.nav button[aria-current="page"]{background:var(--surface-2);color:var(--ink);font-weight:600;box-shadow:inset 3px 0 0 var(--forest)}
+.nav .count:empty{display:none}
+.nav .count{margin-left:auto;font-size:12px;font-weight:600;background:var(--surface-2);border-radius:999px;padding:1px 8px;color:var(--muted)}
+.nav button[aria-current="page"] .count{background:var(--surface)}
+.side .rescue-cta{margin-top:14px}
+.side-foot{margin-top:auto;display:grid;gap:10px;border-top:1px solid var(--line);padding-top:14px}
+.acct{display:flex;align-items:center;gap:10px;min-width:0}
+.acct .who{min-width:0;font-size:14px;line-height:1.3}
+.acct .who b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--forest);color:var(--forest-ink);display:grid;place-items:center;font-weight:700;font-size:15px;flex:none}
+.topbar,.tabbar{display:none}
+main{min-width:0;padding-bottom:64px}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:clamp(16px,3.4vw,40px)}
+
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .side{display:none}
+  .topbar{display:flex;align-items:center;gap:12px;position:sticky;top:env(safe-area-inset-top,0px);z-index:20;height:58px;padding-inline:16px;background:var(--canopy);color:var(--canopy-ink)}
+  .topbar .brand{padding:0;color:var(--canopy-ink)}
+  .topbar .brand b{font-size:22px}
+  .topbar .brand svg{width:30px;height:30px}
+  .topbar .top-acct{margin-left:auto}
+  .topbar .avatar{width:32px;height:32px;font-size:14px}
+  .topbar .btn{padding:6px 14px;font-size:14px;background:transparent;color:var(--canopy-ink);border-color:rgba(255,255,255,.3)}
+  .tabbar{display:grid;grid-template-columns:repeat(5,1fr);align-items:end;position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+  .tabbar button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-radius:10px}
+  .tabbar button[aria-current="page"]{color:var(--forest)}
+  .tabbar .fab{color:var(--ember)}
+  .tabbar .fab span.bub{width:52px;height:52px;margin-top:-26px;border-radius:50%;background:var(--ember);color:var(--ember-ink);display:grid;place-items:center;box-shadow:0 6px 18px -6px var(--ember);border:4px solid var(--surface)}
+  .tabbar .fab .ico{width:24px;height:24px}
+  main{padding-bottom:110px}
+}
+
+/* ---------- canopy band (screen headers) ---------- */
+.band{position:relative;background:var(--canopy);color:var(--canopy-ink);overflow:hidden;isolation:isolate}
+.band::before{content:"";position:absolute;inset:0;z-index:-1;opacity:.16;background-image:var(--contours);background-size:560px 360px}
+.band::after{content:"";position:absolute;inset:auto 0 0 0;height:1px;background:rgba(255,255,255,.08)}
+.band .wrap{padding-block:34px 34px}
+.band h1{font-size:clamp(30px,4.2vw,48px)}
+.band .eyebrow{color:var(--lime)}
+.band .sub{color:var(--canopy-muted);margin-top:10px;max-width:58ch;font-size:16.5px}
+.band.ember-band{background:linear-gradient(120deg,#3B1408 0%,#0F2A1C 70%)}
+.band.ember-band .eyebrow{color:#FFB89B}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+section.view{animation:fade .25s ease}
+@keyframes fade{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}
+:root.reduce-motion section.view,:root.reduce-motion *{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){section.view,*{animation:none!important;transition:none!important}}
+.stack{display:grid;grid-template-columns:minmax(0,1fr);gap:28px;padding-top:28px}
+.stack>*{min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.card-pad{padding:20px}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.sec-head h2{font-size:24px}
+
+/* ---------- home ---------- */
+.hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(20px,4vw,48px);align-items:center}
+.hero h1{font-size:clamp(34px,4.8vw,56px)}
+.hero h1 em{font-style:normal;color:var(--lime)}
+.tagline{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
+.tagline span{border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600;color:var(--canopy-ink);background:rgba(255,255,255,.04)}
+@media (max-width:980px){.hero{grid-template-columns:1fr}}
+
+.scan{background:var(--surface);color:var(--ink);border-radius:20px;padding:16px;display:grid;gap:12px;box-shadow:0 20px 50px -20px rgba(0,0,0,.55)}
+.drop{position:relative;border:2px dashed var(--line);border-radius:14px;aspect-ratio:16/10;max-width:100%;display:grid;place-items:center;text-align:center;padding:18px;background:var(--surface-2);overflow:hidden;transition:border-color .15s,background .15s;cursor:pointer}
+.drop:hover,.drop.over{border-color:var(--forest)}
+.drop img.preview{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.drop .reticle{position:absolute;inset:12%;border-radius:10px;box-shadow:0 0 0 999px rgba(6,16,10,.42)}
+.drop .reticle i{position:absolute;width:26px;height:26px;border:3px solid var(--lime)}
+.drop .reticle i:nth-child(1){left:-2px;top:-2px;border-right:0;border-bottom:0;border-top-left-radius:10px}
+.drop .reticle i:nth-child(2){right:-2px;top:-2px;border-left:0;border-bottom:0;border-top-right-radius:10px}
+.drop .reticle i:nth-child(3){left:-2px;bottom:-2px;border-right:0;border-top:0;border-bottom-left-radius:10px}
+.drop .reticle i:nth-child(4){right:-2px;bottom:-2px;border-left:0;border-top:0;border-bottom-right-radius:10px}
+.drop .reticle::after{content:"";position:absolute;left:4%;right:4%;height:2px;background:var(--lime);box-shadow:0 0 12px var(--lime);top:0;animation:sweep 1.6s ease-in-out infinite alternate}
+@keyframes sweep{to{top:100%}}
+.drop .status{position:absolute;left:12px;right:12px;bottom:12px;background:var(--surface);color:var(--ink);border-radius:10px;padding:9px 12px;font-size:14px;display:flex;align-items:center;gap:10px;justify-content:space-between;font-weight:600}
+.drop-empty{display:grid;justify-items:center;gap:6px}
+.drop-empty .ring{width:58px;height:58px;border-radius:50%;background:var(--surface);display:grid;place-items:center;color:var(--forest);box-shadow:var(--shadow)}
+.drop-empty .ring .ico{width:28px;height:28px}
+.drop-empty h3{font-size:20px;margin-top:6px}
+.drop-empty p{color:var(--muted);font-size:14px}
+.row-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.msg{font-size:14px;border-radius:10px;padding:10px 12px;background:var(--surface-2)}
+.msg.err{color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,var(--surface))}
+.msg.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,var(--surface))}
+
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.stat{padding:16px 18px;display:grid;gap:4px;align-content:start}
+.stat .k{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);font-weight:600}
+.stat .k .ico{width:17px;height:17px;color:var(--forest)}
+.stat .v{font-family:var(--display);font-size:34px;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat .d{font-size:13px;color:var(--muted)}
+.stat.alert .k .ico{color:var(--ember)}
+@media (max-width:900px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.action{position:relative;display:grid;gap:8px;text-align:left;padding:20px;cursor:pointer;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow);transition:transform .15s,border-color .15s}
+.action:hover{transform:translateY(-2px);border-color:var(--forest)}
+.action .badge{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--surface-2);color:var(--forest)}
+.action .badge .ico{width:24px;height:24px}
+.action h3{font-size:21px}
+.action p{color:var(--muted);font-size:14.5px}
+.action .go{position:absolute;right:18px;top:20px;color:var(--muted)}
+.action.rescue{background:var(--ember);border-color:var(--ember);color:var(--ember-ink)}
+.action.rescue .badge{background:rgba(255,255,255,.18);color:var(--ember-ink)}
+.action.rescue p,.action.rescue .go{color:var(--ember-ink);opacity:.88}
+@media (max-width:900px){.actions{grid-template-columns:1fr}}
+
+.split{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:980px){.split{grid-template-columns:1fr}}
+.list{display:grid}
+.li{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:14px;align-items:center;padding:12px 16px;border-top:1px solid var(--line);background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left;cursor:pointer}
+.li:first-child{border-top:0}
+.li:hover{background:var(--surface-2)}
+.li .th{width:56px;height:42px;border-radius:8px;overflow:hidden;background:var(--surface-2)}
+.li .th svg,.li .th img{width:100%;height:100%;display:block;object-fit:cover}
+.li b{display:block;font-weight:600}
+.li .meta{font-size:13px;color:var(--muted)}
+.empty{border:1px dashed var(--line);border-radius:var(--r);padding:34px 20px;text-align:center;color:var(--muted);display:grid;gap:10px;justify-items:center;background:var(--surface)}
+.empty h3{color:var(--ink);font-size:22px}
+.empty .ico{width:34px;height:34px;color:var(--forest)}
+
+.statusbar{display:flex;height:14px;border-radius:999px;overflow:hidden;background:var(--surface-2);gap:2px}
+.statusbar i{display:block;height:100%}
+.legend{display:grid;gap:8px;margin-top:14px;font-size:14px}
+.legend div{display:flex;align-items:center;gap:10px}
+.legend .sw{width:10px;height:10px;border-radius:3px;flex:none}
+.legend .n{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:600}
+.c-lc{background:var(--ok)} .c-nt{background:color-mix(in srgb,var(--warn) 60%,var(--ok))} .c-vu{background:var(--warn)} .c-en{background:var(--bad)} .c-xx{background:var(--muted)}
+.feature{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;align-items:center;margin-top:18px;padding-top:16px;border-top:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;width:100%}
+.feature .th{aspect-ratio:4/3;border-radius:10px;overflow:hidden}
+.feature .th svg,.feature .th img{width:100%;height:100%;display:block;object-fit:cover}
+
+/* ---------- guide / cards ---------- */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.search{position:relative;flex:1 1 240px;max-width:360px}
+.search input{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:10px 14px 10px 40px}
+.search .ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;cursor:pointer;font-weight:600;font-size:14px;color:var(--muted)}
+.chip:hover{border-color:var(--forest);color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--forest);color:var(--forest-ink);border-color:var(--forest)}
+.chip.on-dark{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2);color:var(--canopy-ink)}
+.chip.on-dark[aria-pressed="true"]{background:var(--lime);color:#13221A;border-color:var(--lime)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:18px}
+@media (max-width:520px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}}
+.tile{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;text-align:left;padding:0;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:transform .15s,border-color .15s}
+.tile:hover{transform:translateY(-3px);border-color:var(--forest)}
+.tile .pic{aspect-ratio:4/3;max-width:100%;background:var(--surface-2);overflow:hidden}
+.tile .pic svg,.tile .pic img{width:100%;height:100%;display:block;object-fit:cover;transition:transform .4s}
+.tile:hover .pic svg,.tile:hover .pic img{transform:scale(1.04)}
+.tile .over{position:absolute;left:10px;top:10px;display:flex;gap:6px}
+.tile .body{padding:12px 14px 14px;display:grid;gap:2px;min-width:0}
+.tile .body b{font-weight:600;font-size:16px}
+.tile .body .sci{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tile .foot{display:flex;justify-content:space-between;gap:8px;margin-top:8px;font-size:12.5px;color:var(--muted)}
+.tile .heart{position:absolute;right:10px;top:10px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.92);color:#C2410C}
+.tile .heart .ico{width:16px;height:16px;fill:currentColor;stroke:none}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px;line-height:1.3;white-space:nowrap}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.pill.plain::before{display:none}
+.st-lc{background:color-mix(in srgb,var(--ok) 16%,var(--surface));color:var(--ok)}
+.st-nt{background:color-mix(in srgb,var(--warn) 14%,var(--surface));color:var(--warn)}
+.st-vu{background:color-mix(in srgb,var(--warn) 18%,var(--surface));color:var(--warn)}
+.st-en,.st-cr{background:color-mix(in srgb,var(--bad) 15%,var(--surface));color:var(--bad)}
+.st-xx{background:var(--surface-2);color:var(--muted)}
+.tag{background:rgba(10,24,16,.72);color:#fff}
+
+/* ---------- lore ---------- */
+.lore-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(20px,4vw,44px);align-items:center}
+.lore-hero .pic{position:relative;aspect-ratio:4/3;max-width:100%;border-radius:18px;overflow:hidden;box-shadow:0 24px 50px -24px rgba(0,0,0,.7)}
+.lore-hero .pic svg,.lore-hero .pic img{width:100%;height:100%;display:block;object-fit:cover}
+.lore-hero .credit{position:absolute;left:10px;bottom:10px;font-size:11.5px;background:rgba(0,0,0,.6);color:#fff;border-radius:6px;padding:3px 8px}
+.lore-hero h1{font-size:clamp(36px,5vw,58px)}
+.lore-hero .sci{color:var(--canopy-muted);font-size:19px;margin-top:6px}
+.lore-hero .subsp{color:var(--canopy-muted);font-size:14px;margin-top:6px}
+.lore-hero .pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.lore-hero .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.lore-hero .btn{background:rgba(255,255,255,.08);color:var(--canopy-ink);border-color:rgba(255,255,255,.22)}
+.lore-hero .btn.saved{background:var(--lime);color:#13221A;border-color:var(--lime)}
+.lore-hero .btn.ember{background:var(--ember);color:var(--ember-ink);border-color:var(--ember)}
+.conf{display:grid;gap:6px;font-size:13px;margin-top:16px;max-width:360px;color:var(--canopy-muted)}
+.conf b{color:var(--canopy-ink)}
+.meter{height:6px;border-radius:999px;background:rgba(255,255,255,.12);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--lime)}
+@media (max-width:820px){.lore-hero{grid-template-columns:1fr}}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0;overflow:hidden}
+.facts div{padding:14px 16px;border-left:1px solid var(--line);min-width:0}
+.facts div:first-child{border-left:0}
+.facts dt{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.facts dd{margin:4px 0 0;font-size:14.5px;font-weight:500}
+@media (max-width:760px){.facts{grid-template-columns:repeat(2,minmax(0,1fr))}.facts div{border-left:0;border-top:1px solid var(--line)}.facts div:nth-child(-n+2){border-top:0}.facts div:nth-child(even){border-left:1px solid var(--line)}.facts div:last-child:nth-child(odd){grid-column:1/-1}}
+.reader{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:40px;align-items:start}
+@media (max-width:980px){.reader{grid-template-columns:minmax(0,1fr)}.reader aside{display:none}}
+.tablist{display:flex;gap:6px;padding:5px;background:var(--surface-2);border-radius:999px;width:max-content;max-width:100%;overflow-x:auto}
+.tablist button{background:none;border:0;padding:9px 18px;border-radius:999px;cursor:pointer;font-weight:600;color:var(--muted);white-space:nowrap;display:flex;gap:8px;align-items:center}
+.tablist button small{font-weight:500;font-size:12px;opacity:.8}
+.tablist button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.prose{display:grid;gap:18px;max-width:68ch;font-size:17.5px;line-height:1.75;margin-top:24px}
+.prose p:first-child::first-letter{font-family:var(--display);float:left;font-size:3.3em;line-height:.85;padding:6px 10px 0 0;color:var(--forest)}
+.note{margin-top:24px;font-size:13px;color:var(--muted);max-width:68ch;border-top:1px solid var(--line);padding-top:12px}
+.aside-card{position:sticky;top:24px;display:grid;gap:12px}
+.aside-card h3{font-size:18px}
+.aside-card .li{grid-template-columns:48px minmax(0,1fr);padding:10px 0;border-top:1px solid var(--line)}
+.aside-card .li .th{width:48px;height:36px}
+.aside-card .li:hover{background:none}
+.aside-card .li:hover b{color:var(--forest)}
+
+/* ---------- timeline (recent) ---------- */
+.day{display:grid;gap:10px}
+.day h3{font-family:var(--body);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+
+/* ---------- rescue ---------- */
+.safety{display:flex;gap:12px;align-items:flex-start;margin-top:18px;max-width:720px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);font-size:14.5px;color:var(--canopy-ink)}
+.safety .ico{color:#FFB89B;margin-top:2px}
+.rescue-layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start}
+@media (max-width:1100px){.rescue-layout{grid-template-columns:1fr}}
+.step{padding:22px;display:grid;gap:16px}
+.step-head{display:flex;gap:14px;align-items:center}
+.step-n{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:var(--surface-2);color:var(--muted);flex:none;font-variant-numeric:tabular-nums}
+.step.done .step-n{background:var(--ok);color:#fff}
+.step-head h2{font-size:22px}
+.step-head p{font-size:14px;color:var(--muted)}
+.photo-drop{aspect-ratio:16/9}
+.rs-photo{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:16/9;max-width:100%;background:var(--surface-2)}
+.rs-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.rs-photo .x{position:absolute;right:10px;top:10px}
+.rs-photo .x .btn{padding:6px 12px;font-size:13px}
+.field{display:grid;gap:6px}
+.field>label,.field>.lbl{font-size:14px;font-weight:600}
+.field .opt{font-weight:500;color:var(--muted);font-size:13px}
+.input,textarea.input,select.input{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:11px 13px}
+textarea.input{min-height:110px;resize:vertical;line-height:1.5}
+.input:focus{outline:2px solid var(--forest);outline-offset:0;border-color:transparent}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:620px){.two{grid-template-columns:1fr}}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:12px;padding:4px;gap:4px;flex-wrap:wrap}
+.seg button{border:0;background:none;padding:8px 16px;border-radius:9px;cursor:pointer;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.seg.urgency button[aria-pressed="true"][data-v="Critical"]{background:var(--bad);color:#fff}
+.seg.urgency button[aria-pressed="true"][data-v="Urgent"]{background:var(--warn);color:#fff}
+.seg.urgency button[aria-pressed="true"][data-v="Stable"]{background:var(--ok);color:#fff}
+.loc-card{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center;padding:14px;border-radius:12px;background:var(--surface-2)}
+.pin{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--forest);color:var(--forest-ink);position:relative}
+.pin::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--forest);opacity:.35;animation:ping 1.8s ease-out infinite}
+@keyframes ping{from{transform:scale(.8);opacity:.5}to{transform:scale(1.4);opacity:0}}
+.loc-card b{display:block}
+.summary{position:sticky;top:24px;padding:20px;display:grid;gap:14px}
+.summary h3{font-size:20px}
+.check{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.check li{display:flex;gap:10px;align-items:center;font-size:14.5px;color:var(--muted)}
+.check li .dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;flex:none}
+.check li.ok{color:var(--ink)}
+.check li.ok .dot{background:var(--ok);border-color:var(--ok);color:#fff}
+.check li .dot .ico{width:12px;height:12px;stroke-width:3}
+.sendto{font-size:13px;border-radius:10px;padding:10px 12px;background:var(--surface-2);color:var(--muted)}
+.sendto b{color:var(--ink)}
+.report{display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 16px;border-top:1px solid var(--line)}
+.report:first-child{border-top:0}
+.report .th{width:72px;height:54px;border-radius:8px;overflow:hidden;background:var(--surface-2)}
+.report .th img{width:100%;height:100%;object-fit:cover;display:block}
+.report b{display:block}
+.report .meta{font-size:13px;color:var(--muted)}
+.mail{font-family:var(--mono);font-size:13px;white-space:pre-wrap;background:var(--surface-2);border-radius:10px;padding:14px;max-height:300px;overflow:auto;line-height:1.6}
+
+/* ---------- settings ---------- */
+.settings{display:grid;gap:18px;max-width:780px}
+.set-group h2{font-size:20px;padding:18px 20px 4px}
+.set-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 20px;border-top:1px solid var(--line)}
+.set-group .set-row:first-of-type{border-top:0}
+.set-row small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.switch{position:relative;width:46px;height:28px;flex:none}
+.switch input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer;z-index:1}
+.switch span{position:absolute;inset:0;border-radius:999px;background:var(--line);transition:background .15s}
+.switch span::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.switch input:checked+span{background:var(--forest)}
+.switch input:checked+span::after{transform:translateX(18px)}
+.switch input:focus-visible+span{outline:2px solid var(--forest);outline-offset:2px}
+.kv{font-size:13px;font-weight:600;border-radius:999px;padding:4px 10px;background:var(--surface-2);color:var(--muted);white-space:nowrap}
+.kv.warn{background:color-mix(in srgb,var(--warn) 15%,var(--surface));color:var(--warn)}
+.kv.good{background:color-mix(in srgb,var(--ok) 15%,var(--surface));color:var(--ok)}
+
+/* ---------- login ---------- */
+.login{display:grid;grid-template-columns:1fr 1fr;border-radius:22px;overflow:hidden;background:var(--surface);max-width:980px;margin:32px auto 0;box-shadow:var(--shadow);border:1px solid var(--line)}
+.login .art{position:relative;min-height:420px}
+.login .art svg{position:absolute;inset:0;width:100%;height:100%}
+.login .art .quote{position:absolute;left:20px;right:20px;bottom:20px;color:#fff;font-family:var(--display);font-size:22px;line-height:1.3;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.login form{padding:clamp(22px,4vw,44px);display:grid;gap:14px;align-content:center}
+.login label{display:grid;gap:6px;font-size:14px;font-weight:600}
+.or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+@media (max-width:760px){.login{grid-template-columns:1fr}.login .art{min-height:200px}}
+
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:999px;font-size:14px;font-weight:600;z-index:60;box-shadow:var(--shadow)}
+@media (max-width:900px){.toast{bottom:100px}}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--forest);animation:rot .8s linear infinite;flex:none}
+@keyframes rot{to{transform:rotate(360deg)}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+
+<!-- icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><circle cx="12" cy="12" r="3.5"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></symbol>
+  <symbol id="i-life" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="m5.6 5.6 3.6 3.6M14.8 14.8l3.6 3.6M18.4 5.6l-3.6 3.6M9.2 14.8l-3.6 3.6"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="4"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4z"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 20h20zM12 10v4M12 17.5v.01"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+  <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></symbol>
+  <symbol id="i-logo" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M20 3v5M20 32v5M3 20h5M32 20h5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M20 10c7 4 7 16 0 20-7-4-7-16 0-20z" fill="var(--lime)" stroke="none"/><path d="M20 12v17" stroke="var(--canopy)" stroke-width="1.4"/></symbol>
+</svg>
+
+<div class="topbar">
+  <button class="brand" data-go="home" aria-label="WildLens home"><svg><use href="#i-logo"/></svg><b>WildLens</b></button>
+  <div class="top-acct" id="topAcct"></div>
+</div>
+
+<div class="app">
+  <aside class="side" aria-label="Sidebar">
+    <button class="brand" data-go="home" aria-label="WildLens home"><svg style="color:var(--forest)"><use href="#i-logo"/></svg><b>WildLens</b></button>
+    <nav class="nav" aria-label="Main">
+      <button data-go="home"><svg class="ico"><use href="#i-home"/></svg>Home</button>
+      <button data-go="guide"><svg class="ico"><use href="#i-book"/></svg>Field guide<span class="count" id="cGuide"></span></button>
+      <div class="nav-label">Your research</div>
+      <button data-go="recent"><svg class="ico"><use href="#i-clock"/></svg>Recent<span class="count" id="cRecent"></span></button>
+      <button data-go="saved"><svg class="ico"><use href="#i-heart"/></svg>Saved<span class="count" id="cSaved"></span></button>
+      <button data-go="rescue"><svg class="ico"><use href="#i-life"/></svg>Rescue reports<span class="count" id="cReports"></span></button>
+      <div class="nav-label">App</div>
+      <button data-go="settings"><svg class="ico"><use href="#i-gear"/></svg>Settings</button>
+    </nav>
+    <button class="btn ember block rescue-cta" data-go="rescue"><svg class="ico"><use href="#i-life"/></svg>Rescue an animal</button>
+    <div class="side-foot" id="sideAcct"></div>
+  </aside>
+
+  <main id="main">
+    <!-- HOME -->
+    <section class="view" id="v-home">
+      <div class="band">
+        <div class="wrap hero">
+          <div>
+            <p class="eyebrow" id="greet">Field station</p>
+            <h1 style="margin-top:12px">Photograph an animal. <em>Meet its whole story.</em></h1>
+            <p class="sub">WildLens identifies the species and likely sub-species from your photo, then opens its biology, its history with people and what it symbolizes. Found an animal in trouble? Report it in under a minute.</p>
+            <div class="tagline"><span>Identify</span><span>Learn</span><span>Explore</span><span>Rescue</span></div>
+          </div>
+          <div class="scan" id="scan">
+            <div class="drop" id="drop" role="button" tabindex="0" aria-label="Choose a photo to identify">
+              <div class="drop-empty" id="dropEmpty">
+                <span class="ring"><svg class="ico"><use href="#i-scan"/></svg></span>
+                <h3>Drop a photo to identify</h3>
+                <p>Or paste an image anywhere. JPEG, PNG, WebP or GIF.</p>
+              </div>
+            </div>
+            <div class="row-actions">
+              <label class="btn primary" for="fileIn"><svg class="ico"><use href="#i-image"/></svg>Choose photo</label>
+              <label class="btn" for="camIn"><svg class="ico"><use href="#i-camera"/></svg>Take photo</label>
+              <input id="fileIn" type="file" accept="image/*" class="sr" tabindex="-1">
+              <input id="camIn" type="file" accept="image/*" capture="environment" class="sr" tabindex="-1">
+            </div>
+            <div id="scanMsg" hidden></div>
+            <p class="hint">Identification runs on your own Claude account and asks for permission the first time.</p>
+          </div>
+        </div>
+      </div>
+      <div class="wrap stack">
+        <div class="stats" id="stats"></div>
+        <div class="actions">
+          <button class="action" data-act="identify"><span class="badge"><svg class="ico"><use href="#i-scan"/></svg></span><svg class="ico go"><use href="#i-arrow"/></svg><h3>Identify an animal</h3><p>Upload or take a photo and get the species, sub-species and confidence.</p></button>
+          <button class="action rescue" data-go="rescue"><span class="badge"><svg class="ico"><use href="#i-life"/></svg></span><svg class="ico go"><use href="#i-arrow"/></svg><h3>Rescue an animal</h3><p>Injured, trapped or orphaned? Send a photo, notes and your location.</p></button>
+          <button class="action" data-go="guide"><span class="badge"><svg class="ico"><use href="#i-book"/></svg></span><svg class="ico go"><use href="#i-arrow"/></svg><h3>Browse the field guide</h3><p>Biology, history and symbolism for every species you've met.</p></button>
+        </div>
+        <div class="split">
+          <div class="card">
+            <div class="sec-head card-pad" style="margin:0;padding-bottom:6px"><h2>Continue researching</h2><button class="linkbtn" data-go="recent">See all</button></div>
+            <div id="homeRecent"></div>
+          </div>
+          <div class="card card-pad">
+            <div class="sec-head"><h2>Field guide at a glance</h2></div>
+            <p class="hint" style="margin-bottom:12px">Conservation status of the species in your guide (IUCN Red List).</p>
+            <div id="statusMix"></div>
+            <div id="featured"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GUIDE -->
+    <section class="view" id="v-guide" hidden>
+      <div class="band"><div class="wrap">
+        <div class="page-head"><div><p class="eyebrow">Field guide</p><h1 style="margin-top:10px">Every species, one place</h1><p class="sub">Built-in profiles plus every animal you identify. Filter by group or conservation status.</p></div></div>
+      </div></div>
+      <div class="wrap stack">
+        <div class="toolbar">
+          <label class="search"><svg class="ico"><use href="#i-search"/></svg><input id="guideSearch" type="search" placeholder="Search name or scientific name" aria-label="Search the field guide"></label>
+          <div class="chips" id="guideCats"></div>
+          <select class="input" id="guideStatus" aria-label="Filter by status" style="width:auto;border-radius:999px;padding:9px 14px">
+            <option value="">Any status</option><option value="st-lc">Least Concern</option><option value="st-nt">Near Threatened</option><option value="st-vu">Vulnerable</option><option value="st-en">Endangered</option>
+          </select>
+        </div>
+        <div id="guideGrid"></div>
+      </div>
+    </section>
+
+    <!-- LORE -->
+    <section class="view" id="v-lore" hidden></section>
+
+    <!-- RECENT -->
+    <section class="view" id="v-recent" hidden>
+      <div class="band"><div class="wrap"><div class="page-head">
+        <div><p class="eyebrow">Your research</p><h1 style="margin-top:10px">Recent research</h1><p class="sub">Animals you identified or opened, newest first.</p></div>
+        <button class="btn" id="clearRecent" style="background:transparent;color:var(--canopy-ink);border-color:rgba(255,255,255,.25)">Clear history</button>
+      </div></div></div>
+      <div class="wrap stack">
+        <div class="toolbar"><label class="search"><svg class="ico"><use href="#i-search"/></svg><input id="recentSearch" type="search" placeholder="Search recent" aria-label="Search recent"></label><div class="chips" id="recentFilters"></div></div>
+        <div id="recentList" class="stack" style="padding-top:0"></div>
+      </div>
+    </section>
+
+    <!-- SAVED -->
+    <section class="view" id="v-saved" hidden>
+      <div class="band"><div class="wrap"><p class="eyebrow">Your research</p><h1 style="margin-top:10px">Saved animals</h1><p class="sub" id="savedSub">Your personal collection.</p></div></div>
+      <div class="wrap stack"><div id="savedGrid"></div></div>
+    </section>
+
+    <!-- RESCUE -->
+    <section class="view" id="v-rescue" hidden>
+      <div class="band ember-band"><div class="wrap">
+        <p class="eyebrow">Rescue</p>
+        <h1 style="margin-top:10px">Report an animal that needs help</h1>
+        <p class="sub">Add a photo, describe the animal's condition and share where it is. WildLens sends the report to your local wildlife authorities.</p>
+        <div class="safety"><svg class="ico"><use href="#i-alert"/></svg><div><b>Stay safe.</b> Keep your distance and don't handle wild animals that may bite, scratch or carry disease. If people are in danger, call your local emergency number first.</div></div>
+      </div></div>
+      <div class="wrap stack">
+        <div class="rescue-layout">
+          <form id="rescueForm" class="stack" style="padding-top:0" novalidate>
+            <div class="card step" id="st1">
+              <div class="step-head"><span class="step-n">1</span><div><h2>Photo of the animal</h2><p>One clear photo helps responders judge the situation.</p></div></div>
+              <div id="rsPhotoBox"></div>
+              <div class="row-actions">
+                <label class="btn primary" for="rsCam"><svg class="ico"><use href="#i-camera"/></svg>Take photo</label>
+                <label class="btn" for="rsFile"><svg class="ico"><use href="#i-image"/></svg>Choose photo</label>
+                <input id="rsCam" type="file" accept="image/*" capture="environment" class="sr" tabindex="-1">
+                <input id="rsFile" type="file" accept="image/*" class="sr" tabindex="-1">
+              </div>
+            </div>
+
+            <div class="card step" id="st2">
+              <div class="step-head"><span class="step-n">2</span><div><h2>Condition</h2><p>What's wrong, how urgent it is, and anything responders should know.</p></div></div>
+              <div class="field"><label for="rsSpecies">Animal <span class="opt">(if you know it)</span></label>
+                <div style="display:flex;gap:8px"><input class="input" id="rsSpecies" placeholder="e.g. Red fox, owl, turtle" autocomplete="off"><button class="btn" type="button" id="rsIdentify" hidden><svg class="ico"><use href="#i-sparkle"/></svg>Identify</button></div>
+              </div>
+              <div class="field"><span class="lbl">Situation</span><div class="chips" id="rsSituations"></div></div>
+              <div class="field"><span class="lbl">Urgency</span>
+                <div class="seg urgency" id="rsUrgency"><button type="button" data-v="Stable">Stable</button><button type="button" data-v="Urgent">Urgent</button><button type="button" data-v="Critical">Critical</button></div>
+              </div>
+              <div class="field"><label for="rsComment">Describe the animal's state</label>
+                <textarea class="input" id="rsComment" placeholder="e.g. Fox lying at the roadside, right back leg bleeding, breathing but not moving away when approached. Seen at 7:40 am."></textarea>
+                <span class="hint" id="rsCount">0 / 1000</span>
+              </div>
+              <div class="two">
+                <div class="field"><label for="rsName">Your name <span class="opt">(optional)</span></label><input class="input" id="rsName" autocomplete="name"></div>
+                <div class="field"><label for="rsPhone">Phone for follow-up <span class="opt">(optional)</span></label><input class="input" id="rsPhone" type="tel" autocomplete="tel"></div>
+              </div>
+            </div>
+
+            <div class="card step" id="st3">
+              <div class="step-head"><span class="step-n">3</span><div><h2>Location</h2><p>Use your device's location, or describe the place.</p></div></div>
+              <div id="rsLocBox"></div>
+              <div class="field"><label for="rsPlace">Landmarks or directions <span class="opt">(helps responders find the spot)</span></label><input class="input" id="rsPlace" placeholder="e.g. Next to the bus stop on King Fahd Rd, north side"></div>
+            </div>
+          </form>
+
+          <aside class="card summary" id="rsSummary"></aside>
+        </div>
+
+        <div class="card" id="rsResult" hidden></div>
+
+        <div>
+          <div class="sec-head"><h2>Your reports</h2><span class="hint" id="rsReportsHint"></span></div>
+          <div id="rsReports"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="view" id="v-settings" hidden>
+      <div class="band"><div class="wrap"><p class="eyebrow">App</p><h1 style="margin-top:10px">Settings</h1><p class="sub">Settings, saved animals, history and reports are kept in this browser.</p></div></div>
+      <div class="wrap stack">
+        <div class="settings">
+          <div class="card set-group"><h2>Appearance</h2>
+            <div class="set-row"><div>Theme<small>Auto follows your device.</small></div><div class="seg" id="themeSeg"><button data-v="light">Light</button><button data-v="dark">Dark</button><button data-v="auto">Auto</button></div></div>
+            <div class="set-row"><div>Reduce motion<small>Turn off animations and the scanning effect.</small></div><label class="switch"><input type="checkbox" id="setMotion"><span></span></label></div>
+            <div class="set-row"><div>Language<small>Interface translations are coming later.</small></div><select class="input" id="setLang" style="width:auto"><option>English</option><option>العربية</option><option>Español</option><option>Français</option><option>Deutsch</option></select></div>
+          </div>
+          <div class="card set-group"><h2>Privacy and history</h2>
+            <div class="set-row"><div>Keep research history<small>Show animals you open or identify under Recent.</small></div><label class="switch"><input type="checkbox" id="setHistory"><span></span></label></div>
+            <div class="set-row"><div>Delete all data in this browser<small>Saved animals, history, reports and settings.</small></div><button class="btn" id="wipeBtn">Delete…</button></div>
+            <div class="set-row" id="wipeConfirm" hidden><div><b>Delete everything?</b><small>This can't be undone.</small></div><div style="display:flex;gap:8px"><button class="btn" id="wipeNo">Cancel</button><button class="btn ember" id="wipeYes">Delete</button></div></div>
+          </div>
+          <div class="card set-group"><h2>Rescue reports</h2>
+            <div class="set-row"><div>Email delivery<small id="cfgMailHint"></small></div><span class="kv" id="cfgMail"></span></div>
+            <div class="set-row"><div>Recipients<small>Local authorities that receive reports.</small></div><span class="kv" id="cfgTo"></span></div>
+          </div>
+          <div class="card set-group"><h2>Notifications</h2>
+            <div class="set-row"><div>Product updates<small>Notes about new animals and features.</small></div><label class="switch"><input type="checkbox" id="setUpdates"><span></span></label></div>
+            <div class="set-row"><div>Email digest<small>A weekly summary of your research.</small></div><label class="switch"><input type="checkbox" id="setEmail"><span></span></label></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOGIN -->
+    <section class="view" id="v-login" hidden>
+      <div class="wrap">
+        <div class="login">
+          <div class="art" id="loginArt"></div>
+          <form id="loginForm" novalidate>
+            <div><h2 style="font-size:32px">Welcome back</h2><p class="hint" style="margin-top:6px">Demo sign-in. Any email and password work.</p></div>
+            <label>Email<input class="input" id="loginEmail" type="email" autocomplete="email" placeholder="you@example.com"></label>
+            <label>Password<input class="input" id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••"></label>
+            <button class="btn primary lg" type="submit">Log in</button>
+            <div class="or">or</div>
+            <button class="btn lg" type="button" id="googleBtn">Continue with Google</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<nav class="tabbar" aria-label="Main">
+  <button data-go="home"><svg class="ico"><use href="#i-home"/></svg>Home</button>
+  <button data-go="guide"><svg class="ico"><use href="#i-book"/></svg>Guide</button>
+  <button data-go="rescue" class="fab"><span class="bub"><svg class="ico"><use href="#i-life"/></svg></span>Rescue</button>
+  <button data-go="saved"><svg class="ico"><use href="#i-heart"/></svg>Saved</button>
+  <button data-go="settings"><svg class="ico"><use href="#i-gear"/></svg>Settings</button>
+</nav>
+<div class="toast" id="toast" role="status" hidden></div>
